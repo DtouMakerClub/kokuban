@@ -1,25 +1,94 @@
 ﻿#include <opencv2/opencv.hpp>
 
+
+/// <summary>
+/// 画像を2値化する（仮）
+/// </summary>
+/// <param name="frame">処理対象のカラー画像</param>
+/// <param name="threshold">2値化の閾値</param>
+/// <param name="is_bright">画像が明るいときはtrueにすると良いかも</param>
+/// <returns>2値化した画像</returns>
+cv::Mat color_to_binary(cv::Mat frame, int threshold, bool is_bright = false) {
+	if (frame.empty() == true) {
+		std::cout << "Error : failed read image" << std::endl;
+	}
+	else {
+		cv::Mat gray_image; //グレースケール画像を入れる
+		cv::Mat threshold_image;//2値化した画像を入れる
+		cv::cvtColor(frame, gray_image, cv::COLOR_BGR2GRAY); //グレースケールに変換
+
+		//2値化画像に変換
+		if (is_bright) {
+			cv::threshold(gray_image, threshold_image, 200, 255, cv::THRESH_TOZERO_INV);
+			cv::bitwise_not(threshold_image, threshold_image); // 白黒の反転
+			cv::threshold(threshold_image, threshold_image, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+		}
+		else {
+			cv::threshold(gray_image, threshold_image, threshold, 255, cv::THRESH_BINARY);
+		}
+
+		return threshold_image;
+	}
+}
+
+/// <summary>
+/// 矩形を検出する
+/// 検出した矩形に線を描いた画像を返す
+/// </summary>
+/// <param name="threshold_image">画像</param>
+/// <returns>黒板の領域を検出した画像</returns>
+cv::Mat conto(cv::Mat img ){
+	std::vector<std::vector<cv::Point>> contours;
+	std::vector<cv::Vec4i> hierarchy;
+	cv::Mat gray_img;
+	int detection_size = 15; // 検出する矩形の大きさ
+
+	gray_img = color_to_binary(img, 128);//2値画像に変換する
+	//矩形検出
+	cv::findContours(gray_img, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_TC89_L1);
+
+	int max_level = 0;
+	for (int i = 0; i < contours.size(); i++) {
+		// ある程度の面積が有るものだけに絞る
+		double detection_area = contourArea(contours[i], false);
+		//一定以上の面積しか検出しない
+		if (detection_area > detection_size) {
+			//輪郭を直線近似する
+			std::vector<cv::Point> approx;
+			cv::approxPolyDP(cv::Mat(contours[i]), approx, 0.01 * cv::arcLength(contours[i], true), true);
+			// 矩形のみ取得
+			if (approx.size() == 4) {
+				cv::drawContours(img, contours, i, cv::Scalar(255, 0, 0, 255), 3, 8, hierarchy, max_level);
+			}
+		}
+	}
+	return img;
+}
+
+/// <summary>
+/// 黒板上のチョークで書かれた位置を判定
+/// 2値化だけでできるならいらない
+/// </summary>
+
 ///<summary>
 ///<para>カメラと接続してフレームごとに処理をする</para>
 /// <para>camera open and some process every frame</para>
 ///</summary>
 ///<param name="device_nan">開くデバイスの選択</param>
 /// <param name="fn">取得したフレームを引数に取り処理をする関数</param>
-template<class Fn> int camera_capture(int device_nan, Fn fn) {
+template<class Fn> void run_capture_and_process(int device_nan, Fn fn) {
 	assert(device_nan >= 0);
 	cv::VideoCapture cap(device_nan);
 	if (!cap.isOpened()) {
-		std::cout << "Error : failed open camera" << std:: endl;
-		return - 1;
+		std::cout << "Error : failed open camera" << std::endl;
+		//break;
 	}
 
 	cv::Mat frame; //取得したフレーム
+	cv::Mat out;
 	while (cap.read(frame)) {
 		//取得したフレーム対してする処理を書く
-		//fn(frame, 128);
-
-		cv::imshow("win", frame);//画像を表示．
+		cv::imshow("win", conto(frame));//画像を表示．
 		const int key = cv::waitKey(1);
 		if (key == 'q') //qボタンが押されたとき
 		{
@@ -29,48 +98,41 @@ template<class Fn> int camera_capture(int device_nan, Fn fn) {
 
 	cap.release();
 	cv::destroyAllWindows();
-	return 0;
-}
-
-/// <summary>
-/// 画像を2値化する（仮）
-/// </summary>
-/// <param name="frame">処理対象のカラー画像</param>
-/// <param name="threshold">2値化の閾値</param>
-/// <returns>2値化した画像</returns>
-cv::Mat color_to_binary(cv::Mat frame, int threshold) {
-	if (frame.empty() == true) {
-		std::cout << "Error : failed read image" << std::endl;
-	}
-	else {
-		cv::Mat gray_img; //グレースケール画像を入れる
-		cv::Mat threshold_img;//2値化した画像を入れる
-		cv::cvtColor(frame, gray_img, cv::COLOR_BGR2GRAY); //グレースケールに変換
-		cv::threshold(gray_img, threshold_img, threshold, 255, cv::THRESH_BINARY);//2値化画像に変換
-
-		return threshold_img;
-	}
 }
 
 
-void test() {
+void test_binary() {
 	cv::Mat input_img = cv::imread("sample.png", cv::IMREAD_UNCHANGED);
 	if (input_img.empty() == true) {
 		// 画像データが読み込めなかったときは終了する
 		std::cout << "Error : failed read img" << std::endl;
 	}
 	else {
-		cv::Mat frame = color_to_binary(input_img, 128);
+		cv::Mat frame = color_to_binary(input_img, 18);
 		cv::imshow("binary", frame);//画像を表示
 		cv::waitKey(1);
 	}
 }
 
+void test_run() {
+	//run_capture_and_process(0, color_to_binary);
+	
+	cv::Mat input_img = cv::imread("box.png", cv::IMREAD_UNCHANGED);
+	if (input_img.empty() == true) {
+		// 画像データが読み込めなかったときは終了する
+		std::cout << "Error : failed read img" << std::endl;
+	}
+	else {
+		cv::Mat frame = conto(input_img);
+		cv::imshow("binary", frame);//画像を表示
+		cv::waitKey(1);
+	}//*/
+}
+
 
 int main()
 {
-	//camera_capture(0,color_to_binary);
-	test();
+	test_run();
 	std::string x;
 	std::cin >> x;
 	cv::destroyAllWindows();
