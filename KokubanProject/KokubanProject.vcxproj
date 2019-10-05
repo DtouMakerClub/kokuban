@@ -23,7 +23,7 @@
     <ProjectGuid>{84D49A89-660D-4FAD-BE2B-590588D1712B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>KokubanProject</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -42,13 +42,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -168,9 +168,17 @@
     <Image Include="sample.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ayataka\AreaMoveState.inl" />
+    <None Include="ayataka\EraserManager.inl" />
+    <None Include="ayataka\EraserStateBase.inl" />
+    <None Include="ayataka\PointMoveState.inl" />
     <None Include="ayataka\RectangleDetection.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ayataka\AreaMoveState.h" />
+    <ClInclude Include="ayataka\EraserManager.h" />
+    <ClInclude Include="ayataka\EraserStateBase.h" />
+    <ClInclude Include="ayataka\PointMoveState.h" />
     <ClInclude Include="ayataka\RectangleDetection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
