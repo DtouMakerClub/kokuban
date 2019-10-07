@@ -20,7 +20,5 @@ namespace Eraser
 		// 自身の位置に最近傍の点を取得する
 		cv::Point2i FindNearest(int index);
 
-		int m_nowArea;						// 自分が現在いるエリアインデックス
-		cv::Point2i m_targetPos;			// 目標位置の座標
 	};
 }

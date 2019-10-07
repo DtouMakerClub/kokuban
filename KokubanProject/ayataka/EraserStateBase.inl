@@ -14,7 +14,37 @@ namespace Eraser
 
 	void EraserStateBase::Update()
 	{
+		// 検出したチョークの取得
 
+
+		// 状態の更新判定
+		UpdateState();
+	}
+
+	inline void EraserStateBase::UpdateState()
+	{
+		// 現エリアの重みが小さくなったら(1/10を想定)
+		// 1024 / 3 = 340 / 10 = だいたい30ピクセルぐらい
+		if (m_weight < 30)
+		{
+			m_status = AreaMove;
+		}
+
+		// エリアの移動が完了したら
+		if (m_nowAreaIndex == m_targetIndex)
+		{
+			m_status = PointMove;
+		}
+
+	}
+
+	inline void EraserStateBase::CulcurateArea()
+	{
+		for (auto chalk : chalkPoints)
+		{
+			int area = PointToArea(chalk);
+			m_areaWeight[area]++;
+		}
 	}
 
 	inline cv::Point2i EraserStateBase::AreaToPoint(int index)

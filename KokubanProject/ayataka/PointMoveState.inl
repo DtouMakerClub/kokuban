@@ -15,19 +15,18 @@ namespace Eraser
 	void PointMoveState::Update()
 	{
 		// エリアの重み算出
-
+		CulcurateArea();
 
 		// 目標座標の算出
 		Move();
 		
-		// 目標座標の送信
-
+		EraserStateBase::Update();
 	}
 
 	void PointMoveState::Move()
 	{
 		// 自身から最も近い点を取得する
-		m_targetPos = FindNearest(m_nowArea);
+		m_targetPoint = FindNearest(m_nowAreaIndex);
 	}
 
 	inline cv::Point2i PointMoveState::FindNearest(int index)

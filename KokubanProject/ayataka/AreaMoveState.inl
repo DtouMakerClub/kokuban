@@ -12,19 +12,21 @@ namespace Eraser
 
 	}
 
+	void AreaMoveState::Update()
+	{
+		// 移動するためのエリアを選出
+		m_targetIndex = TargetAreaCheck();
+
+		// 移動するための座標計算
+		Move(m_targetIndex);
+
+		EraserStateBase::Update();
+	}
+
 	inline void AreaMoveState::Move(int index)
 	{
 		// 目的エリアの設定
-		m_targetPos = AreaToPoint(index);
-	}
-
-	inline void AreaMoveState::CulcurateArea()
-	{
-		for (auto chalk : chalkPoints)
-		{
-			int area = PointToArea(chalk);
-			m_areaWeight[area]++;
-		}
+		m_targetPoint = AreaToPoint(index);
 	}
 
 	inline int AreaMoveState::TargetAreaCheck()
@@ -33,21 +35,4 @@ namespace Eraser
 
 		return max;
 	}
-
-	void AreaMoveState::Update()
-	{
-		// エリアの重み算出
-		CulcurateArea();
-
-		// 移動するためのエリアを選出
-		m_targetIndex = TargetAreaCheck();
-
-		// 移動するための座標計算
-		Move(m_targetIndex);
-
-		// 目標座標の送信
-
-	}
-
-
 }
