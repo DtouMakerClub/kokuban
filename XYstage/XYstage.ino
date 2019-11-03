@@ -1,60 +1,33 @@
-const int PIN_MOTOR_XY_ENABLE = 8;
-const int PIN_MOTOR_X_STEP = 2;
-const int PIN_MOTOR_X_DIR = 5;
-const int PIN_MOTOR_Y_STEP = 3;
-const int PIN_MOTOR_Y_DIR = 6;
+#include "motorController.hpp"
 
-//motor
-const int MOTOR_ENABLE = LOW;
-const int MOTOR_DISABLE = !MOTOR_ENABLE;
-//motor rotation direction
-const bool X_RIGHT = HIGH;
-const bool X_LEFT = !X_RIGHT;
-const bool Y_RIGHT = HIGH;
-const bool Y_LEFT = !Y_RIGHT;
+char command = 0;
 
+const unsigned long STEPPING_MOTOR_PERIOD_HALF_US = 300;//100;//周期はこれの２倍
 
-const unsigned long STEPPING_MOTOR_PERIOD_HALF_MS = 10/2;
-
-int amplitudeXPulseNum = 500;
-//bool step = LOW;
+MotorController motorController = MotorController();
 
 void setup() {
-  //init
-  pinMode(PIN_MOTOR_XY_ENABLE,OUTPUT);
-  pinMode(PIN_MOTOR_X_STEP,OUTPUT);
-  pinMode(PIN_MOTOR_X_DIR,OUTPUT);
-  pinMode(PIN_MOTOR_Y_STEP,OUTPUT);
-  pinMode(PIN_MOTOR_Y_DIR,OUTPUT);
+  Serial.begin(9600);
+  Serial.print("This is XYstage.ino\n");
+
+  motorController.pinSetup();
   pinMode(LED_BUILTIN,OUTPUT);
 
-  //motorON
-  digitalWrite(PIN_MOTOR_XY_ENABLE,MOTOR_ENABLE);
+  digitalWrite(LED_BUILTIN,HIGH);
 }
 
 void loop() {
-  digitalWrite(PIN_MOTOR_X_DIR,X_RIGHT);
-  digitalWrite(PIN_MOTOR_Y_DIR,Y_RIGHT);
-  digitalWrite(LED_BUILTIN,HIGH);
-  for(int i = 0; i < amplitudeXPulseNum; i++){
-    digitalWrite(PIN_MOTOR_X_STEP,HIGH);
-    digitalWrite(PIN_MOTOR_Y_STEP,HIGH);
-    delay(STEPPING_MOTOR_PERIOD_HALF_MS);
-    digitalWrite(PIN_MOTOR_X_STEP,LOW);
-    digitalWrite(PIN_MOTOR_Y_STEP,LOW);
-    delay(STEPPING_MOTOR_PERIOD_HALF_MS);
-  }
+  command = Serial.read();
 
-  digitalWrite(PIN_MOTOR_X_DIR,X_LEFT);
-  digitalWrite(PIN_MOTOR_Y_DIR,Y_LEFT);
-  digitalWrite(LED_BUILTIN,LOW);
-  for(int i = 0; i < amplitudeXPulseNum; i++){
-    digitalWrite(PIN_MOTOR_X_STEP,HIGH);
-    digitalWrite(PIN_MOTOR_Y_STEP,HIGH);
-    delay(STEPPING_MOTOR_PERIOD_HALF_MS);
-    digitalWrite(PIN_MOTOR_X_STEP,LOW);
-    digitalWrite(PIN_MOTOR_Y_STEP,LOW);
-    delay(STEPPING_MOTOR_PERIOD_HALF_MS);
+  if(command == 'c'){
+    Serial.print("start calibration\n");
+
+    motorController.calibration();
+
+    Serial.print("X range : ");
+    Serial.print(motorController.getXRange(),DEC);
+    Serial.print("\nY range : ");
+    Serial.print(motorController.getYRange(),DEC);
   }
 }
 
