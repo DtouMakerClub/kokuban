@@ -1,7 +1,7 @@
 #ifndef MOTOR_CONTROLLER_H
 #define MOTOR_CONTROLLER_H
 
-#include <TimerOne.h>
+//#include <TimerOne.h>
 
 class MotorController
 {
@@ -27,38 +27,62 @@ private:
     const bool Y_PLUS = HIGH;
     const bool Y_MINUS = !Y_PLUS;
 
+    //XY table size mm
+    const long actualRangeXmm = 0;
+    const long actualRangeYmm = 0;
+
     //motor pulse
     bool pulseStateX = 0;
     bool pulseStateY = 0;
-    long positionX = 0;
-    long positionY = 0;
-    long targetX = 0;
-    long targetY = 0;
+    long positionXStep = 0;
+    long positionYStep = 0;
+    long targetXStep = 45824/2;//適当に中央ぐらい
+    long targetYStep = 63140/2;
+
+    //const long controllSycleTimeUS = 100000;//制御周期、設定値ではない便宜上の値。ほんとの値は知らない。制御の単位時間
+    long speedXHz = 15000;//パルスの周波数
+    long speedYHz = 15000;
+    long periodXUS = 1000000 / speedXHz;//単位時間/周波数　-> 周期 これをタイマの周期とする
+    long periodYUS = 1000000 / speedYHz;
+
+    //position mm
+    long positionXmm = 0;
+    long positionYmm = 0;
+    long targetXmm = 0;
+    long targetYmm = 0;
 
     //キャリブレーション用
-    //bool calibXFinishedFlag = false;
-    //bool calibYFinishedFlag = false;
+    bool calibFinished = false;
     long rangeX = 0;
     long rangeY = 0;
-    const int HALF_PERIOD_OF_PULSE_MICROSEC = 600 / 2;
+    const int HALF_PERIOD_OF_PULSE_MICROSEC = 150 / 2;
     void moveXOneStepPlusForCalib();
     void moveXOneStepMinusForCalib();
     void moveYOneStepPlusForCalib();
     void moveYOneStepMinusForCalib();
 
-
+    //リミットスイッチ
     bool isX0Limit();
     bool isX1Limit();
     bool isY0Limit();
     bool isY1Limit();
     bool isLimit();
+    
+
 
     //const unsigned long STEPPING_MOTOR_PERIOD_HALF_US = 300; //100;//周期はこれの２倍
 public:
     void pinSetup();
     void calibration();
+    bool isCalibFinished();
+    int setXSpeedToTarget();
+    long getTimerPeriodForX();
+    long getTimerPeriodForY();
     long getXRange();
     long getYRange();
+    //目標地点追従用
+    void toggleXPulseAndUpdatePosition();
+    void toggleYPulseAndUpdatePosition();
 };
 
 #endif
