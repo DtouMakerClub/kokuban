@@ -1,7 +1,9 @@
 #include "motorController.hpp"
 #include <TimerOne.h>
+#include "ellipsetable.hpp"
 
 char command = 0;
+int targetIndex = 0;
 
 const unsigned long STEPPING_MOTOR_PERIOD_HALF_US = 300;//100;//周期はこれの２倍
 
@@ -39,8 +41,13 @@ void loop() {
   }
 
   if(motorController.isCalibFinished()){
-    motorController.setXSpeedToTarget();
+    // motorController.setXSpeedToTarget();
+    motorController.setTargetPoint(ellipse[targetIndex][0],ellipse[targetIndex][1]);
+    targetIndex++;
+    targetIndex %= TARGET_MAX;
+    delay(100);
   }
+
 }
 
 void handler1(){

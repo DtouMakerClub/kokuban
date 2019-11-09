@@ -54,11 +54,21 @@ void MotorController::toggleXPulseAndUpdatePosition()
         }
         else if (targetXStep > positionXStep)
         {
-            direction = X_PLUS;
+            if(!isX1Limit()){
+                direction = X_PLUS;
+            }
+            else{
+                direction = -1;
+            }
         }
         else if (targetXStep < positionXStep)
         {
-            direction = X_MINUS;
+            if(!isX0Limit()){
+                direction = X_MINUS;
+            }
+            else{
+                direction = -1;
+            }
         }
 
         if (direction == X_PLUS && positionXStep < rangeX)
@@ -92,11 +102,21 @@ void MotorController::toggleYPulseAndUpdatePosition()
         }
         else if (targetYStep > positionYStep)
         {
-            direction = Y_PLUS;
+            if(!isY1Limit()){
+                direction = Y_PLUS;
+            }
+            else{
+                direction = -1;
+            }
         }
         else if (targetYStep < positionYStep)
         {
-            direction = Y_MINUS;
+            if(!isY0Limit()){
+                direction = Y_MINUS;
+            }
+            else{
+                direction = -1;
+            }
         }
 
         if (direction == Y_PLUS && positionYStep < rangeY)
@@ -218,4 +238,11 @@ long MotorController::getXRange()
 long MotorController::getYRange()
 {
     return rangeY;
+}
+
+void MotorController::setTargetPoint(long x, long y){
+    if( 0 <= x && x <= rangeX && 0 <= y && y <= rangeY ){
+        targetXStep = x;
+        targetYStep = y;        
+    }
 }

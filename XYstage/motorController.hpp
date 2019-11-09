@@ -81,6 +81,7 @@ public:
     long getXRange();
     long getYRange();
     //目標地点追従用
+    void setTargetPoint(long x, long y);
     void toggleXPulseAndUpdatePosition();
     void toggleYPulseAndUpdatePosition();
 };
