@@ -3,6 +3,7 @@
 ƒJƒƒ‰‚Ìˆ—
 
 “®ìŠÂ‹«
+visualstudio2019
 OpenCV4.1.1
 C++17
 

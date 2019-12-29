@@ -1,5 +1,5 @@
 ﻿#include <opencv2/opencv.hpp>
-
+#include <kokubanCV.h>
 
 /// <summary>
 /// 画像を2値化する（仮）
@@ -8,7 +8,7 @@
 /// <param name="threshold">2値化の閾値</param>
 /// <param name="is_bright">画像が明るいときはtrueにすると良いかも</param>
 /// <returns>2値化した画像</returns>
-cv::Mat color_to_binary(cv::Mat frame, int threshold, bool is_bright = false) {
+cv::Mat color_to_binary(cv::Mat frame, int threshold = 128, bool is_bright = false) {
 	if (frame.empty() == true) {
 		std::cout << "Error : failed read image" << std::endl;
 	}
@@ -36,8 +36,8 @@ cv::Mat color_to_binary(cv::Mat frame, int threshold, bool is_bright = false) {
 /// 検出した矩形に線を描いた画像を返す
 /// </summary>
 /// <param name="threshold_image">画像</param>
-/// <returns>黒板の領域を検出した画像</returns>
-cv::Mat conto(cv::Mat img ){
+/// <returns>黒板の領域を検出した座標</returns>
+std::vector<std::vector<cv::Point>> conto(cv::Mat img ){
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
 	cv::Mat gray_img;
@@ -59,16 +59,13 @@ cv::Mat conto(cv::Mat img ){
 			// 矩形のみ取得
 			if (approx.size() == 4) {
 				cv::drawContours(img, contours, i, cv::Scalar(255, 0, 0, 255), 3, 8, hierarchy, max_level);
+				//cv::imshow("binary", img);//画像を表示
 			}
 		}
 	}
-	return img;
+	return contours;
 }
 
-/// <summary>
-/// 黒板上のチョークで書かれた位置を判定
-/// 2値化だけでできるならいらない
-/// </summary>
 
 ///<summary>
 ///<para>カメラと接続してフレームごとに処理をする</para>
@@ -88,7 +85,8 @@ template<class Fn> void run_capture_and_process(int device_nan, Fn fn) {
 	cv::Mat out;
 	while (cap.read(frame)) {
 		//取得したフレーム対してする処理を書く
-		cv::imshow("win", conto(frame));//画像を表示．
+
+		cv::imshow("win", fn(frame, 128,true));//画像を表示．
 		const int key = cv::waitKey(1);
 		if (key == 'q') //qボタンが押されたとき
 		{
@@ -114,25 +112,78 @@ void test_binary() {
 	}
 }
 
-void test_run() {
-	//run_capture_and_process(0, color_to_binary);
-	
-	cv::Mat input_img = cv::imread("box.png", cv::IMREAD_UNCHANGED);
+void test_Capture() {
+
+	//kokubanCV::funcVideo("kokubanvideo.mp4","kok.mp4", color_to_binary);
+	cv::VideoCapture cap = kokubanCV::openVideoFile("kokubanvideo.mp4");
+	// 作成する動画ファイルの諸設定
+	int    fourcc, width, height;
+	double fps;
+
+	width = (int)cap.get(cv::CAP_PROP_FRAME_WIDTH);	// フレーム横幅を取得
+	height = (int)cap.get(cv::CAP_PROP_FRAME_HEIGHT);	// フレーム縦幅を取得
+	fps = cap.get(cv::CAP_PROP_FPS);					// フレームレートを取得
+	fourcc = (int)cap.get(cv::CAP_PROP_FOURCC);//cv::VideoWriter::fourcc('X', 'V', 'I', 'D');	
+	// * エンコード形式 "XVID" = AVI, "MP4V" = MPEG4, "WMV1" = WMV
+
+	// 動画ファイルを書き出すためのオブジェクトを宣言する
+	cv::VideoWriter writer;
+	writer.open("koku.mp4", fourcc, fps, cv::Size(width, height));
+
+	cv::Mat frame, dst;
+
+	while (true) {
+
+		cap >> frame;
+
+		if (frame.empty() == true) {
+			break;
+		}
+
+		//何か処理をする
+		dst = color_to_binary(frame);
+
+		//cv::imshow("変換中", dst);
+		std::cout << "処理中" << std::endl;
+		writer << dst;
+
+		//cv::waitKey(1);
+	}
+	writer.release();
+	std::cout << "end " << std::endl;
+	/*
+	cv::Mat input_img = cv::imread("kokuban.jpg", cv::IMREAD_UNCHANGED);
 	if (input_img.empty() == true) {
 		// 画像データが読み込めなかったときは終了する
 		std::cout << "Error : failed read img" << std::endl;
 	}
 	else {
-		cv::Mat frame = conto(input_img);
+		cv::Mat frame = color_to_binary(input_img, 128);
+			//conto(input_img);
 		cv::imshow("binary", frame);//画像を表示
 		cv::waitKey(1);
 	}//*/
 }
 
 
+void testChalk() {
+	cv::Mat input_img = cv::imread("kokuban.jpg", cv::IMREAD_UNCHANGED);
+	if (input_img.empty() == true) {
+		// 画像データが読み込めなかったときは終了する
+		std::cout << "Error : failed read img" << std::endl;
+	}
+	else {
+		cv::Mat frame = color_to_binary(input_img, 128);
+		conto(input_img);
+		kokubanCV::pulledOutChalkOnKokuban(frame, conto(input_img));
+		cv::imshow("binary", frame);//画像を表示
+		cv::waitKey(1);
+	}
+}
+
 int main()
 {
-	test_run();
+	testChalk();
 	std::string x;
 	std::cin >> x;
 	cv::destroyAllWindows();
