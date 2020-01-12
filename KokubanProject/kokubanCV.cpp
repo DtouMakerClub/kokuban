@@ -2,7 +2,7 @@
 
 namespace kokubanCV {
 
-	std::vector<std::vector<int>> pulledOutChalkOnKokuban(cv::Mat binary_image, std::vector<std::vector<cv::Point>> kokuban_contours)
+	std::vector<cv::Point>  pulledOutChalkOnKokuban(cv::Mat binary_image, std::vector<std::vector<cv::Point>> kokuban_contours)
 	{
 		//std::vector<std::vector<int>> chalkPoints(binary_image.cols, std::vector<int> (binary_image.rows));
 		//黒板の範囲内を抽出
@@ -11,7 +11,8 @@ namespace kokubanCV {
 
 		int width = binary_image.cols;
 		int height = binary_image.rows;
-		std::vector<std::vector<int>>chalkPoints(width, std::vector<int>(height));
+		//std::vector<std::vector<int>>chalkPoints(width, std::vector<int>(height));
+		std::vector<cv::Point> chalkPoints;
 
 		cv::Vec3b zero = (0, 0, 0);
 
@@ -22,9 +23,9 @@ namespace kokubanCV {
 			for (int x = 0; x < width -10 ; ++x) {
 				//x軸を走査
 				if (src[x][0] == 0) {
-					chalkPoints[x][y] = 1;
+					chalkPoints.push_back(cv::Point(x,y));
 				}
-				std::cout << chalkPoints[x][y];
+				//std::cout << chalkPoints.back;
 				//std::cout << src[x];
 			}
 			std::cout << std::endl;
@@ -36,9 +37,6 @@ namespace kokubanCV {
 		// 		std::cout << chalkPoints.at(position[0]).at(position[1]) << std::endl;
 		// 	}
 		// 	});
-		
-
-		//チョークで書かれた場所を抽出
 
 		//抽出した点群の座標を返す
 		return chalkPoints;
