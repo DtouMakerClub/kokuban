@@ -34,9 +34,33 @@
     <None Include="ayataka\RectangleDetection.inl">
       <Filter>ソース ファイル\ayataka</Filter>
     </None>
+    <None Include="ayataka\EraserManager.inl">
+      <Filter>ソース ファイル\ayataka</Filter>
+    </None>
+    <None Include="ayataka\EraserStateBase.inl">
+      <Filter>ソース ファイル\ayataka</Filter>
+    </None>
+    <None Include="ayataka\AreaMoveState.inl">
+      <Filter>ソース ファイル\ayataka</Filter>
+    </None>
+    <None Include="ayataka\PointMoveState.inl">
+      <Filter>ソース ファイル\ayataka</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ayataka\RectangleDetection.h">
+      <Filter>ソース ファイル\ayataka</Filter>
+    </ClInclude>
+    <ClInclude Include="ayataka\EraserManager.h">
+      <Filter>ソース ファイル\ayataka</Filter>
+    </ClInclude>
+    <ClInclude Include="ayataka\EraserStateBase.h">
+      <Filter>ソース ファイル\ayataka</Filter>
+    </ClInclude>
+    <ClInclude Include="ayataka\AreaMoveState.h">
+      <Filter>ソース ファイル\ayataka</Filter>
+    </ClInclude>
+    <ClInclude Include="ayataka\PointMoveState.h">
       <Filter>ソース ファイル\ayataka</Filter>
     </ClInclude>
   </ItemGroup>
