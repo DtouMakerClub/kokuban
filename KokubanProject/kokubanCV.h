@@ -10,7 +10,8 @@ namespace kokubanCV {
 	/// <param name="binary_img">2値化した画像</param>
 	/// <param name="kokuban_contours">黒板の外形の頂点座標</param>
 	/// <returns></returns>
-	std::vector<cv::Point>  pulledOutChalkOnKokuban(cv::Mat binary_image, std::vector<std::vector<cv::Point>> kokuban_contours);
+	std::vector<cv::Point>  pulledOutChalkOnKokuban(cv::Mat binary_image);
+	cv::Mat binary(cv::Mat img);
 	
 	cv::VideoCapture openVideoFile(std::string video_name);
 	template <class Fn> void funcVideo(std::string video_name, std::string save_file_name, Fn fn);

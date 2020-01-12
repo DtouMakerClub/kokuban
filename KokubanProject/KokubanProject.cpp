@@ -165,6 +165,7 @@ void test_Capture() {
 	}//*/
 }
 
+std::vector<cv::Point> a;
 
 void testChalk() {
 	cv::Mat input_img = cv::imread("kokuban.jpg", cv::IMREAD_UNCHANGED);
@@ -173,9 +174,8 @@ void testChalk() {
 		std::cout << "Error : failed read img" << std::endl;
 	}
 	else {
-		cv::Mat frame = color_to_binary(input_img, 128);
-		conto(input_img);
-		kokubanCV::pulledOutChalkOnKokuban(frame, conto(input_img));
+		cv::Mat frame = kokubanCV::binary(input_img);// color_to_binary(input_img, 128);
+		a = kokubanCV::pulledOutChalkOnKokuban(frame);
 		cv::imshow("binary", frame);//画像を表示
 		cv::waitKey(1);
 	}
