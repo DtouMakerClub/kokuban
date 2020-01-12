@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <opencv2\opencv.hpp>
 
@@ -18,6 +18,13 @@ namespace Eraser
 
 		void Update();
 
+		void TestChalk();
+
+		cv::Point2i GetNowPoint() { return m_nowPoint; }
+		int GetNowArea() { return m_nowAreaIndex; }
+		cv::Point2i GetTargetPoint() { return m_targetPoint; }
+		int GetTargetArea() { return m_targetIndex; }
+
 		std::vector<cv::Point2i> chalkPoints;			// 検出したチョークのピクセル
 	private:
 		// 状態の更新処理
@@ -35,7 +42,7 @@ namespace Eraser
 
 		int m_areaWeight[9];				// 各エリアの重み
 		int m_nowAreaIndex;					// 自分の位置エリア
-		cv::Point2i nowPoint;				// 自分の位置座標
+		cv::Point2i m_nowPoint;				// 自分の位置座標
 		int m_targetIndex;					// 目標位置のエリア
 		cv::Point2i m_targetPoint;			// 目標位置の座標
 

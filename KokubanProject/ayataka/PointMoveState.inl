@@ -37,7 +37,7 @@ namespace Eraser
 
 		for (auto chalk : chalkPoints)
 		{
-			dist = cv::norm(chalk - nowPoint);
+			dist = cv::norm(chalk - m_nowPoint);
 			if (minDist > dist)
 			{
 				target = chalk;
