@@ -3,6 +3,11 @@
 #include "ellipsetable.hpp"
 
 
+const int DATA_LENGHT_INIT = 2;
+const int DATA_LENGHT_MOVE = 4;
+const int DATA_LENGHT_FREEZE = 2;
+
+
 enum State{
   NOT_INITIALIZED,
   MOVE,
@@ -38,7 +43,8 @@ State state = NOT_INITIALIZED;
 CommunicationData receiveData;
 bool commandReceived = false;
 
-
+  String inputString = "";
+  bool stringComplete = false;
 
 char receiveBuf = 0;
 char command = 0;
@@ -66,55 +72,71 @@ void setup() {
 }
 
 void loop() {
-  /*
-  if(Serial.available() > 0 ){
-    receiveData.initialize();
-    receiveBuf = Serial.read();
-    if(receiveBuf == 'i' || receiveBuf =='I'){
-      receiveData.setCommand('I');
-    }
-    else if(receiveData == 'M'){
-      //フォーマット通りだった時だけ移動命令と解釈する
-      dataDigitCounter = 0;
-      while(serial.available() > 0 && dataDigitCounter < dataDigitSum){
-        receiveBuf = Serial.read();
-        if(dataDigitCounter<dataDigitX){
-          
-        }else if(dataDigitCounter< (dataDigitX + dataDigitY) {
-          
+  //受信データのパース
+  while (Serial.available()) {
+
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag
+    // so the main loop can do something about it:
+    if (inChar == '\n') {
+      stringComplete = true;
+      receiveData.initialize();
+
+      if (inputString.charAt(0) == 'I')
+      {
+      //toggleLED(); //ここにはくる
+      //Serial.print(inputString.length());
+        if (inputString.length() == DATA_LENGHT_INIT)
+        {
+          receiveData.setCommand('I');
+          commandReceived = true;
         }
       }
-      if(dataDigitCounter == (dataDigitMaxNum + dataDigitMaxNum)){
-        receiveData.setCommand('M');
+      else if (inputString[0] == 'M')
+      {
+        if (inputString.length() == DATA_LENGHT_MOVE)
+        {
+          receiveData.setCommand('M');
+          receiveData.setX(inputString[1]);
+          receiveData.setY(inputString[2]);
+          commandReceived = true;
+        }
       }
-    }
-    else if(receiveData == 'F'){
-      receiveData.setCommand('F');
+      else if (inputString[0] == 'F')
+      {
+        if (inputString.length() == DATA_LENGHT_FREEZE)
+        {
+          receiveData.setCommand('F');
+          commandReceived = true;
+        }
+      }
+      toggleLED();
+      inputString = "";
+      stringComplete = false;
     }
   }
-
-  */
 
   if(commandReceived){
-    //toggleLED();
+    if(command == 'I' || command == 'i'){
+      Serial.print("start calibration\n");
+
+      motorController.calibration();
+
+      Serial.print("X range : ");
+      Serial.print(motorController.getXRange(),DEC);
+      Serial.print("\nY range : ");
+      Serial.print(motorController.getYRange(),DEC);
+
+      state = MOVE;
+    }else if(state == MOVE && command == 'M'){
+
+    }
     commandReceived = false;
   }
- 
-  if(command == 'I' || command == 'i'){
-    Serial.print("start calibration\n");
 
-    motorController.calibration();
-
-    Serial.print("X range : ");
-    Serial.print(motorController.getXRange(),DEC);
-    Serial.print("\nY range : ");
-    Serial.print(motorController.getYRange(),DEC);
-
-    state = MOVE;
-  }else if(state == MOVE && command == 'M'){
-
-  }
-
+  //指令位置へ動作するための速度計算等（の予定）
   if(motorController.isCalibFinished()){
     // motorController.setXSpeedToTarget();
 
@@ -130,6 +152,11 @@ void loop() {
     delay(10);
   }
 
+  //現在位置の送信
+  if(motorController.isCalibFinished()){
+    sendToPC('0','1');
+  }
+
 }
 
 void handler1(){
@@ -140,64 +167,16 @@ void handler2(){
   motorController.toggleYPulseAndUpdatePosition();
 }
 
-/*
-  SerialEvent occurs whenever a new data comes in the
- hardware serial RX.  This routine is run between each
- time loop() runs, so using delay inside loop can delay
- response.  Multiple bytes of data may be available.
- */
-//mainloopでコマンドを処理する前にコマンドを書き換えてしまう可能性があるのでmainloop内に入れた方がいいかも
-void serialEvent() {
-  String inputString = "";
-  bool stringComplete = false;
+void sendToPC(const unsigned char x, const unsigned char y){
+  Serial.write('K');
+  Serial.write(x);
+  Serial.write(y);
+  Serial.write('\n');
+}
 
-  while (Serial.available()) {
-    // get the new byte:
-    char inChar = (char)Serial.read();
-    // add it to the inputString:
-    inputString += inChar;
-    // if the incoming character is a newline, set a flag
-    // so the main loop can do something about it:
-    if (inChar == '\n') {
-      stringComplete = true;
-      //toggleLED();
-    }
-  }
-  
-  if(stringComplete){
-    receiveData.initialize();
-    //toggleLED();//ここにはくる
-
-    if (inputString.charAt(0) == 'I')
-    {
-      if (inputString.length() == 1)
-      {
-        receiveData.setCommand('I');
-        commandReceived = true;
-      }
-    }
-    else if (inputString[0] == 'M')
-    {
-      if (inputString.length() == 3)
-      {
-        receiveData.setCommand('M');
-        receiveData.setX(inputString[1]);
-        receiveData.setY(inputString[2]);
-        commandReceived = true;
-      }
-    }
-    else if (inputString[0] == 'F')
-    {
-      if (inputString.length() == 1)
-      {
-        receiveData.setCommand('F');
-        commandReceived = true;
-      }
-    }
-
-    stringComplete = false;
-  }
-  
+unsigned char convertToSendRange(const long motorStepNum, const long motorStepRange){
+  const char SEND_RANGE = 255;
+  return motorStepNum * SEND_RANGE / motorStepRange;
 }
 
 void toggleLED(){
