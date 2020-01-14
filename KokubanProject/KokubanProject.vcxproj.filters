@@ -1,67 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="リソース ファイル">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="ソース ファイル\ayataka">
-      <UniqueIdentifier>{1b6f37a5-e6bc-4905-b851-a56ceeb6fa84}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="kokubanCV.cpp" />
+    <ClCompile Include="KokubanProject.cpp" />
+    <ClCompile Include="SerialWrapper.cpp" />
+    <ClCompile Include="KokubanSerial.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="KokubanProject.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
+    <ClInclude Include="ayataka\AreaMoveState.h" />
+    <ClInclude Include="ayataka\EraserManager.h" />
+    <ClInclude Include="ayataka\EraserStateBase.h" />
+    <ClInclude Include="ayataka\PointMoveState.h" />
+    <ClInclude Include="ayataka\RectangleDetection.h" />
+    <ClInclude Include="kokubanCV.h" />
+    <ClInclude Include="SerialWrapper.h" />
+    <ClInclude Include="KokubanSerial.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="sample.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ayataka\AreaMoveState.inl" />
+    <None Include="ayataka\EraserManager.inl" />
+    <None Include="ayataka\EraserStateBase.inl" />
+    <None Include="ayataka\PointMoveState.inl" />
+    <None Include="ayataka\RectangleDetection.inl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="sample.png">
-      <Filter>リソース ファイル</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ayataka\RectangleDetection.inl">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </None>
-    <None Include="ayataka\EraserManager.inl">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </None>
-    <None Include="ayataka\EraserStateBase.inl">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </None>
-    <None Include="ayataka\AreaMoveState.inl">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </None>
-    <None Include="ayataka\PointMoveState.inl">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ayataka\RectangleDetection.h">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </ClInclude>
-    <ClInclude Include="ayataka\EraserManager.h">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </ClInclude>
-    <ClInclude Include="ayataka\EraserStateBase.h">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </ClInclude>
-    <ClInclude Include="ayataka\AreaMoveState.h">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </ClInclude>
-    <ClInclude Include="ayataka\PointMoveState.h">
-      <Filter>ソース ファイル\ayataka</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

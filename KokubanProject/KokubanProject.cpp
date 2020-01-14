@@ -1,5 +1,5 @@
 ﻿#include <opencv2/opencv.hpp>
-#include <kokubanCV.h>
+#include "kokubanCV.h"
 
 /// <summary>
 /// 画像を2値化する（仮）
