@@ -1,10 +1,11 @@
-#include "EraserStateBase.h"
+﻿#include "EraserStateBase.h"
 
 namespace Eraser
 {
 	EraserStateBase::EraserStateBase()
 	{
-
+		// テスト用チョーク点群のセット
+		TestChalk();
 	}
 
 	EraserStateBase::~EraserStateBase()
@@ -19,6 +20,16 @@ namespace Eraser
 
 		// 状態の更新判定
 		UpdateState();
+	}
+
+	inline void EraserStateBase::TestChalk()
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			cv::Point2i point(i + 50, i + 50);
+
+			chalkPoints.push_back(point);
+		}
 	}
 
 	inline void EraserStateBase::UpdateState()
@@ -36,6 +47,15 @@ namespace Eraser
 			m_status = PointMove;
 		}
 
+		switch (m_status)
+		{
+		case EraserStatus::AreaMove:
+			break;
+		case EraserStatus::PointMove:
+			break;
+		default:
+			break;
+		}
 	}
 
 	inline void EraserStateBase::CulcurateArea()
@@ -102,12 +122,12 @@ namespace Eraser
 		}
 		else
 		{
-			std::cout << "[ERASER]x座標上は黒板にいません。";
+			std::cout << "[ERASER]x座標上は黒板にいません。" << std::endl;
 		}
 
 		// 行の判定
 		// ピクセルサイズの1024(変数や定数化するのがスマート)
-		if (0 < pos.y && pos.y < 1024 / (1/3) )
+		if (0 < pos.y && pos.y < 1024 * (1/3) )
 		{
 			y_index = 0;
 		}
@@ -121,7 +141,7 @@ namespace Eraser
 		}
 		else
 		{
-			std::cout << "[ERASER]y座標上は黒板にいません。";
+			std::cout << "[ERASER]y座標上は黒板にいません。" << std::endl;
 		}
 
 		// 現状だと(3×3なので)
