@@ -27,7 +27,7 @@ namespace kokubanCV {
 				//x²‚ğ‘–¸
 				if (src[x][0] == 255 && src[x][1] == 255) {
 					chalkPoints.push_back(cv::Point(x,y));
-					std::cout << chalkPoints.back() << std::endl;
+					//std::cout << chalkPoints.back() << std::endl;
 					//std::cout << src[x] << std::endl;
 				}
 				//std::cout << src[x];
@@ -59,7 +59,7 @@ namespace kokubanCV {
 
 			for (int x = 0; x < width; ++x) {
 				//x²‚ğ‘–¸
-				if (img.at<cv::Vec3b>(y, x)[0] > 128 && img.at<cv::Vec3b>(y, x)[1] > 128 && img.at<cv::Vec3b>(y, x)[2] > 128) {
+				if (img.at<cv::Vec3b>(y, x)[0] * 0.299 +  img.at<cv::Vec3b>(y, x)[1] * 0.587 +  img.at<cv::Vec3b>(y, x)[2]  * 0.114 > 128) {
 					binary_img.at<cv::Vec3b>(y, x)[0] = 255;
 					binary_img.at<cv::Vec3b>(y, x)[1] = 255;
 					binary_img.at<cv::Vec3b>(y, x)[2] = 255;
