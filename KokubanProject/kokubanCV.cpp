@@ -25,7 +25,7 @@ namespace kokubanCV {
 			//std::cout << "y = " <<  y <<" :  ";
 			for (int x = 0; x < width; ++x) {
 				//x軸を走査
-				if (src[x][0] == 255 && src[x][1] == 255) {
+				if (img.at<cv::Vec3b>(y, x)[0] * 0.299 + img.at<cv::Vec3b>(y, x)[1] * 0.587 + img.at<cv::Vec3b>(y, x)[2] * 0.114 > 128) {
 					chalkPoints.push_back(cv::Point(x,y));
 					//std::cout << chalkPoints.back() << std::endl;
 					//std::cout << src[x] << std::endl;
@@ -47,6 +47,12 @@ namespace kokubanCV {
 		return chalkPoints;
 	}
 
+	/// <summary>
+	/// 入力画像がjpgならまともに動く
+	/// pngは変になる（たぶん配列に入っている順番とか要素が違う）
+	/// </summary>
+	/// <param name="img"></param>
+	/// <returns></returns>
 	cv::Mat binary(cv::Mat img)
 	{
 		int width = img.cols;
