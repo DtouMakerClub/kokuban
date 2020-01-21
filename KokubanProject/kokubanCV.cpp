@@ -2,7 +2,7 @@
 
 namespace kokubanCV {
 
-	std::vector<cv::Point>  pulledOutChalkOnKokuban(cv::Mat image, int threshold = 128)
+	std::vector<cv::Point>  pulledOutChalkOnKokuban(cv::Mat image, int threshold)
 	{
 		int width = image.cols;
 		int height = image.rows;
@@ -28,7 +28,7 @@ namespace kokubanCV {
 	}
 
 
-	cv::Mat binary(cv::Mat img, int threshold = 128)
+	cv::Mat binary(cv::Mat img, int threshold)
 	{
 		int width = img.cols;
 		int height = img.rows;
