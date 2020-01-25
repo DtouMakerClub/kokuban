@@ -182,7 +182,7 @@ void testChalk() {
 }
 
 void  testMouse() {
-	cv::Mat input_img = cv::imread("kokutes.jpg", cv::IMREAD_UNCHANGED);
+	cv::Mat input_img = cv::imread("kokuban.jpg", cv::IMREAD_UNCHANGED);
 	if (input_img.empty() == true) {
 		// 画像データが読み込めなかったときは終了する
 		std::cout << "Error : failed read img" << std::endl;
@@ -192,16 +192,37 @@ void  testMouse() {
 		cv::Mat frame = input_img;
 		cv::imshow("binary", frame);//画像を表示
 		cv::setMouseCallback("binary", kokubanCV::mouseCallback, &mouse);
+		int width = frame.cols;
+		int height = frame.rows;
+
+		cv::Point2f src_pt[4] = {};
+		const cv::Point2f dst_pt[4] = {
+					cv::Point2f(50,							 50),
+					cv::Point2f(50,							 50 + height - 1),
+					cv::Point2f(50 + width - 1,       50),
+					cv::Point2f(50 + width - 1,       50 + height - 1) };
+
+		int i = 0;
+		cv::Mat dst = cv::Mat::zeros(height + 100, width + 100, CV_8UC3);
 
 		while (1) {
 			cv::waitKey(2);
-			//左クリックがあったら表示
-			if (mouse.event == cv::EVENT_LBUTTONDOWN) {
+			//左クリックした座標を取得
+			if (mouse.event == cv::EVENT_LBUTTONDOWN && i <= 4) {
 				//クリック後のマウスの座標を出力
 				std::cout << mouse.x << " , " << mouse.y << std::endl;
+				// 左上、左下、右上、右下の順で入力
+				src_pt[i] = cv::Point2f(mouse.x, mouse.y);
+				++i;
+				cv::waitKey(100);
 			}
-			//右クリックがあったら終了
-			else if (mouse.event == cv::EVENT_RBUTTONDOWN) {
+			//4点クリックで終了
+			else if (i>=4) {
+				cv::Mat homography_matrix = getPerspectiveTransform(src_pt, dst_pt);
+				warpPerspective(frame, dst, homography_matrix, dst.size());
+				imshow("result", dst);
+				imwrite("field_out.png", dst);
+				cv::waitKey(20);
 				break;
 			}
 		}
