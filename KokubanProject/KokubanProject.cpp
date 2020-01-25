@@ -181,10 +181,38 @@ void testChalk() {
 	}
 }
 
+void  testMouse() {
+	cv::Mat input_img = cv::imread("kokutes.jpg", cv::IMREAD_UNCHANGED);
+	if (input_img.empty() == true) {
+		// 画像データが読み込めなかったときは終了する
+		std::cout << "Error : failed read img" << std::endl;
+	}
+	else {
+		kokubanCV::mouseParam mouse;
+		cv::Mat frame = input_img;
+		cv::imshow("binary", frame);//画像を表示
+		cv::setMouseCallback("binary", kokubanCV::mouseCallback, &mouse);
+
+		while (1) {
+			cv::waitKey(2);
+			//左クリックがあったら表示
+			if (mouse.event == cv::EVENT_LBUTTONDOWN) {
+				//クリック後のマウスの座標を出力
+				std::cout << mouse.x << " , " << mouse.y << std::endl;
+			}
+			//右クリックがあったら終了
+			else if (mouse.event == cv::EVENT_RBUTTONDOWN) {
+				break;
+			}
+		}
+	}
+}
+
 int main()
 {
-	testChalk();
+	testMouse();
 	std::string x;
 	std::cin >> x;
 	cv::destroyAllWindows();
+	return 0;
 }
