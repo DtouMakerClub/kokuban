@@ -86,8 +86,6 @@ void loop() {
 
       if (inputString.charAt(0) == 'I')
       {
-      //toggleLED(); //ここにはくる
-      //Serial.print(inputString.length());
         if (inputString.length() == DATA_LENGHT_INIT)
         {
           receiveData.setCommand('I');
@@ -112,7 +110,6 @@ void loop() {
           commandReceived = true;
         }
       }
-      toggleLED();
       inputString = "";
       stringComplete = false;
     }
