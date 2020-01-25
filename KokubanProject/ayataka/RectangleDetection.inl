@@ -9,17 +9,17 @@ RectangleDetection::~RectangleDetection()
 {
 }
 
-// ŒŸo‚µ‚ÄÔü‚ÅˆÍ‚Ş
+// æ¤œå‡ºã—ã¦èµ¤ç·šã§å›²ã‚€
 cv::Mat RectangleDetection::Detect(cv::Mat frame)
 {
-	// ƒOƒŒ[ƒXƒP[ƒ‹‚É•ÏŠ·‚µ‚Ä2’l‰»(ˆê“x‚ ‚é’ö“x‚Ì’l‚ğ”ò‚Î‚µ‚ÄŠ÷‚Ì”’‚³‚ğ’²®‚µ‚Ä‚é)
+	// ã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã«å¤‰æ›ã—ã¦2å€¤åŒ–(ä¸€åº¦ã‚ã‚‹ç¨‹åº¦ã®å€¤ã‚’é£›ã°ã—ã¦æœºã®ç™½ã•ã‚’èª¿æ•´ã—ã¦ã‚‹)
 	cv::Mat gray;
 	cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 	cv::threshold(gray, gray, 200, 255, cv::THRESH_TOZERO_INV);
-	cv::bitwise_not(gray, gray); // ”’•‚Ì”½“]
+	cv::bitwise_not(gray, gray); // ç™½é»’ã®åè»¢
 	cv::threshold(gray, gray, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-	// ‹éŒ`‚ÌŒŸo
+	// çŸ©å½¢ã®æ¤œå‡º
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
 	cv::findContours(gray, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_TC89_L1);
@@ -27,13 +27,13 @@ cv::Mat RectangleDetection::Detect(cv::Mat frame)
 	std::vector<std::vector<cv::Point>> tmpContours;
 	
 	for (int i = 0; i < contours.size(); i++) {
-		// ‚ ‚é’ö“x‚Ì–ÊÏ‚ª—L‚é‚à‚Ì‚¾‚¯‚Éi‚é
+		// ã‚ã‚‹ç¨‹åº¦ã®é¢ç©ãŒæœ‰ã‚‹ã‚‚ã®ã ã‘ã«çµã‚‹
 		double a = contourArea(contours[i], false);
 		if (a > 15000) {
-			//—ÖŠs‚ğ’¼ü‹ß—‚·‚é
+			//è¼ªéƒ­ã‚’ç›´ç·šè¿‘ä¼¼ã™ã‚‹
 			std::vector<cv::Point> approx;
 			cv::approxPolyDP(cv::Mat(contours[i]), approx, 0.01 * cv::arcLength(contours[i], true), true);
-			// ‹éŒ`‚Ì‚İæ“¾
+			// çŸ©å½¢ã®ã¿å–å¾—
 			if (approx.size() == 4) {
 				tmpContours.push_back(approx);
 			}

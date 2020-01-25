@@ -1,5 +1,5 @@
 ﻿#include <opencv2/opencv.hpp>
-#include <kokubanCV.h>
+#include "kokubanCV.h"
 
 /// <summary>
 /// 画像を2値化する（仮）
@@ -141,10 +141,10 @@ void test_Capture() {
 		}
 
 		//何か処理をする
-		dst = color_to_binary(frame);
+		dst = kokubanCV::binary(frame);
 
 		//cv::imshow("変換中", dst);
-		std::cout << "処理中" << std::endl;
+		//std::cout << "処理中" << std::endl;
 		writer << dst;
 
 		//cv::waitKey(1);
@@ -165,17 +165,17 @@ void test_Capture() {
 	}//*/
 }
 
+std::vector<cv::Point> a;
 
 void testChalk() {
-	cv::Mat input_img = cv::imread("kokuban.jpg", cv::IMREAD_UNCHANGED);
+	cv::Mat input_img = cv::imread("kokutes.jpg", cv::IMREAD_UNCHANGED);
 	if (input_img.empty() == true) {
 		// 画像データが読み込めなかったときは終了する
 		std::cout << "Error : failed read img" << std::endl;
 	}
 	else {
-		cv::Mat frame = color_to_binary(input_img, 128);
-		conto(input_img);
-		kokubanCV::pulledOutChalkOnKokuban(frame, conto(input_img));
+		cv::Mat frame = input_img;// color_to_binary(input_img, 128);
+		a = kokubanCV::pulledOutChalkOnKokuban(frame);
 		cv::imshow("binary", frame);//画像を表示
 		cv::waitKey(1);
 	}
