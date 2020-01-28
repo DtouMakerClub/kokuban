@@ -25,6 +25,8 @@ namespace Eraser
 		void DebugDraw(cv::Mat img);
 
 		cv::Point2i const CAMERA_RESOLUTION = cv::Point2i(1478, 1108);
+		// 上の解像度だと100ピクセルぐらいがちょうどいいので0.1%	
+		float const MOVE_RATE = 0.001f;					
 
 		int const HEIGHT_SECTION = 3;
 		int const WIDTH_SECTION = 3;

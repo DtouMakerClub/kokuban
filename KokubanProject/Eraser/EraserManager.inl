@@ -72,8 +72,37 @@ namespace Eraser
 		//img = cv::Scalar(255, 255, 255);
 
 		// チョークリーナー
-		cv::Point p1(20, 80);
-		cv::rectangle(img, m_eraserPos, m_eraserPos + p1, cv::Scalar(255, 0, 0), 10, cv::LINE_4);
+		cv::Point p1(20, 40);
+		cv::Scalar color;
+
+		switch (m_state)
+		{
+		case EraserMoveState::AREA:
+			color = cv::Scalar(255, 0, 0);
+			break;
+		case EraserMoveState::POINT:
+			color = cv::Scalar(0, 0, 255);
+			break;
+		default:
+			color = cv::Scalar(0, 255, 0);
+			break;
+		}
+
+		cv::rectangle(img, m_eraserPos, m_eraserPos + p1, color, 10, cv::LINE_4);
+		
+		// 目的地
+		//cv::rectangle(img, m_targetPoint, m_targetPoint + cv::Point(5, 5), cv::Scalar(0, 0, 255), 1, cv::LINE_4);
+
+		// エリアわけライン
+		cv::Point x1_line(CAMERA_RESOLUTION.x / 3, 0);
+		cv::Point x2_line((CAMERA_RESOLUTION.x / 3) * 2, 0);
+		cv::Point y1_line(0, CAMERA_RESOLUTION.y / 3);
+		cv::Point y2_line(0, (CAMERA_RESOLUTION.y / 3) * 2);
+
+		cv::line(img, x1_line, x1_line + cv::Point(0, CAMERA_RESOLUTION.y), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
+		cv::line(img, x2_line, x2_line + cv::Point(0, CAMERA_RESOLUTION.y), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
+		cv::line(img, y1_line, y1_line + cv::Point(CAMERA_RESOLUTION.x, 0), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
+		cv::line(img, y2_line, y2_line + cv::Point(CAMERA_RESOLUTION.x, 0), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
 
 		// チョーク
 		//for (auto chalk : chalks)
@@ -115,10 +144,11 @@ namespace Eraser
 	}
 	inline void EraserManager::UpdateState()
 	{
-		// 現エリアの重みが小さくなったら(1/10を想定)
-		if (m_areaWeight[m_nowAreaIndex] < ((CAMERA_RESOLUTION.x * CAMERA_RESOLUTION.y) / 3) / 10 )
+		// 現エリアの重みが小さくなったら
+		if (m_areaWeight[m_nowAreaIndex] < ((CAMERA_RESOLUTION.x * CAMERA_RESOLUTION.y) / 9) * MOVE_RATE)
 		{
 			m_state = EraserMoveState::AREA;
+			CulcurateArea();
 		}
 
 		// エリアの移動が完了したら
@@ -166,28 +196,28 @@ namespace Eraser
 
 		if (index < 3)
 		{
-			result.x = CAMERA_RESOLUTION.x * 1 / 6;
+			result.x = CAMERA_RESOLUTION.x / 6;
 		}
 		else if (index < 6)
 		{
-			result.x = CAMERA_RESOLUTION.x * 1 / 2;
+			result.x = CAMERA_RESOLUTION.x / 2;
 		}
 		else if (index < 9)
 		{
-			result.x = CAMERA_RESOLUTION.x * 5 / 6;
+			result.x = (CAMERA_RESOLUTION.x / 6) * 5;
 		}
 
 		if (index % 3 == 0)
 		{
-			result.y = CAMERA_RESOLUTION.y * 1 / 6;
+			result.y = CAMERA_RESOLUTION.y / 6;
 		}
 		else if (index % 3 == 1)
 		{
-			result.y = CAMERA_RESOLUTION.y * 1 / 2;
+			result.y = CAMERA_RESOLUTION.y / 2;
 		}
 		else if (index % 3 == 2)
 		{
-			result.y = CAMERA_RESOLUTION.y * 5 / 6;
+			result.y = (CAMERA_RESOLUTION.y / 6) * 5;
 		}
 
 		return result;
@@ -217,15 +247,15 @@ namespace Eraser
 		}
 
 		// 行の判定
-		if (0 < pos.y && pos.y < CAMERA_RESOLUTION.y * (1 / 3))
+		if (0 < pos.y && pos.y < CAMERA_RESOLUTION.y / 3)
 		{
 			y_index = 0;
 		}
-		else if (CAMERA_RESOLUTION.y * (1 / 3) < pos.y && pos.y < CAMERA_RESOLUTION.y * (2 / 3))
+		else if (CAMERA_RESOLUTION.y / 3 < pos.y && pos.y < (CAMERA_RESOLUTION.y / 3) * 2)
 		{
 			y_index = 1;
 		}
-		else if (CAMERA_RESOLUTION.y * (2 / 3) && pos.y < CAMERA_RESOLUTION.y)
+		else if ((CAMERA_RESOLUTION.y / 3) * 2 && pos.y < CAMERA_RESOLUTION.y)
 		{
 			y_index = 2;
 		}
