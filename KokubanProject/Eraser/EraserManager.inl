@@ -41,6 +41,7 @@ namespace Eraser
 		m_nowAreaIndex = PointToArea(m_eraserPos);
 		cv::Point2i vec = m_targetPoint - m_eraserPos;
 		vec /= cv::norm(vec);
+		m_prevPos = m_eraserPos;
 		m_eraserPos += vec * 2;
 	}
 
@@ -55,7 +56,6 @@ namespace Eraser
 			break;
 		case EraserMoveState::AREA:
 			// 移動するためのエリアを選出
-			m_targetIndex = TargetAreaCheck();
 			m_targetPoint = AreaToPoint(m_targetIndex);
 			break;
 		case EraserMoveState::POINT:
@@ -89,7 +89,7 @@ namespace Eraser
 		}
 
 		cv::rectangle(img, m_eraserPos, m_eraserPos + p1, color, 10, cv::LINE_4);
-		
+
 		// 目的地
 		//cv::rectangle(img, m_targetPoint, m_targetPoint + cv::Point(5, 5), cv::Scalar(0, 0, 255), 1, cv::LINE_4);
 
@@ -111,9 +111,9 @@ namespace Eraser
 		//}
 
 
-		std::cout << "pos:" << m_eraserPos << std::endl;
-		std::cout << "area:" << m_nowAreaIndex << std::endl;
-		std::cout << "target:" << m_targetIndex << std::endl;
+		//std::cout << "pos:" << m_eraserPos << std::endl;
+		//std::cout << "area:" << m_nowAreaIndex << std::endl;
+		//std::cout << "target:" << m_targetIndex << std::endl;
 
 		cv::imshow("test", img);
 		cv::waitKey(1);
@@ -129,15 +129,15 @@ namespace Eraser
 		for (auto chalk : chalkPoints)
 		{
 			int area = PointToArea(chalk);
-			if (area == m_nowAreaIndex)
-			{
-				dist = static_cast<float>(cv::norm(chalk - m_eraserPos));
+			/*if (area == m_nowAreaIndex)
+			{*/
+				dist = GetDistance(chalk, m_eraserPos);
 				if (minDist > dist)
 				{
 					target = chalk;
 					minDist = dist;
 				}
-			}
+			//}
 		}
 
 		return target;
@@ -145,7 +145,9 @@ namespace Eraser
 	inline void EraserManager::UpdateState()
 	{
 		// 現エリアの重みが小さくなったら
-		if (m_areaWeight[m_nowAreaIndex] < ((CAMERA_RESOLUTION.x * CAMERA_RESOLUTION.y) / 9) * MOVE_RATE)
+		//if (m_areaWeight[m_nowAreaIndex] < ((CAMERA_RESOLUTION.x * CAMERA_RESOLUTION.y) / 9) * MOVE_RATE)
+		// ある一定の近さにチョークがなかったら
+		if (GetDistance(m_targetPoint, m_eraserPos) > 200.0f)
 		{
 			m_state = EraserMoveState::AREA;
 			CulcurateArea();
@@ -155,7 +157,8 @@ namespace Eraser
 		else if (m_nowAreaIndex == m_targetIndex)
 		{
 			m_state = EraserMoveState::POINT;
-			CulcurateArea();
+			//CulcurateArea();
+			m_targetIndex = std::rand() % 9;//TargetAreaCheck();
 		}
 	}
 
@@ -282,5 +285,18 @@ namespace Eraser
 			int area = PointToArea(chalk);
 			m_areaWeight[area]++;
 		}
+	}
+	inline cv::Point2i EraserManager::PointToRatio(cv::Point2i pos)
+	{
+		cv::Point2i result;
+
+		result.x = (pos.x / CAMERA_RESOLUTION.x) * 255;
+		result.y = (pos.y / CAMERA_RESOLUTION.y) * 255;
+
+		return result;
+	}
+	inline float EraserManager::GetDistance(cv::Point p1, cv::Point p2)
+	{
+		return static_cast<float>(cv::norm(p1 - p2));;
 	}
 }
