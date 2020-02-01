@@ -240,6 +240,16 @@ long MotorController::getYRange()
     return rangeY;
 }
 
+long MotorController::getPositionXStep()
+{
+    return positionXStep;
+}
+
+long MotorController::getPositionYStep()
+{
+    return positionYStep;
+}
+
 void MotorController::setTargetPoint(long x, long y){
     if( 0 <= x && x <= rangeX && 0 <= y && y <= rangeY ){
         targetXStep = x;

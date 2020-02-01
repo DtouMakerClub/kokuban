@@ -7,6 +7,7 @@ const int DATA_LENGHT_INIT = 2;
 const int DATA_LENGHT_MOVE = 4;
 const int DATA_LENGHT_FREEZE = 2;
 
+const unsigned char SEND_RANGE = 255;
 
 enum State{
   NOT_INITIALIZED,
@@ -36,6 +37,15 @@ public:
   void setY(unsigned char y){
     _y = y;
   }
+  char getCommand(){
+    return  _command;
+  }
+  unsigned char getX(){
+    return _x;
+  }
+  unsigned char getY(){
+    return _y;
+  }
 };
 
 State state = NOT_INITIALIZED;
@@ -43,12 +53,8 @@ State state = NOT_INITIALIZED;
 CommunicationData receiveData;
 bool commandReceived = false;
 
-  String inputString = "";
-  bool stringComplete = false;
-
-char receiveBuf = 0;
-char command = 0;
-int targetIndex = 0;//楕円動作用
+String inputString = "";
+bool stringComplete = false;
 
 
 const unsigned long STEPPING_MOTOR_PERIOD_HALF_US = 300;//100;//周期はこれの２倍
@@ -116,34 +122,48 @@ void loop() {
   }
 
   if(commandReceived){
-    if(command == 'I' || command == 'i'){
+    if(receiveData.getCommand() == 'I' ){
       Serial.print("start calibration\n");
-
+      
       motorController.calibration();
 
       Serial.print("X range : ");
       Serial.print(motorController.getXRange(),DEC);
       Serial.print("\nY range : ");
       Serial.print(motorController.getYRange(),DEC);
+      Serial.print('\n');
 
       state = MOVE;
-    }else if(state == MOVE && command == 'M'){
-
     }
+    else if(receiveData.getCommand() == 'M'){
+      if(state == MOVE){
+        //受信値をモータ―のレンジに変換(OK)
+        //それを平滑化(まだ)
+        //目標値更新(OK)
+        motorController.setTargetPoint(
+          convertToMotorStepRange(receiveData.getX(),motorController.getXRange()),
+          convertToMotorStepRange(receiveData.getY(),motorController.getYRange())
+        );
+        // Serial.print(convertToMotorStepRange(receiveData.getX(),motorController.getXRange()), DEC);
+        // Serial.print('\n');
+        // Serial.print(convertToMotorStepRange(receiveData.getY(),motorController.getYRange()), DEC);
+        // Serial.print('\n');
+      }
+    }
+    else if(receiveData.getCommand() == 'F'){
+      state = STAY;
+    }
+    
     commandReceived = false;
   }
 
   //指令位置へ動作するための速度計算等（の予定）
   if(motorController.isCalibFinished()){
-    // motorController.setXSpeedToTarget();
 
-    
-    //楕円形に動かす
-    // motorController.setTargetPoint(ellipse[targetIndex][0],ellipse[targetIndex][1]);
-    // targetIndex++;
-    // targetIndex %= TARGET_MAX;
-    // delay(100);
-    //楕円形ここまで
+    if(state == MOVE){
+      //
+    }
+    // motorController.setXSpeedToTarget();
 
     //motorController.setTargetPoint();
     delay(10);
@@ -151,7 +171,10 @@ void loop() {
 
   //現在位置の送信
   if(motorController.isCalibFinished()){
-    sendToPC('0','1');
+    sendToPC(
+      convertToSendRange(motorController.getPositionXStep(),motorController.getXRange()),
+      convertToSendRange(motorController.getPositionYStep(),motorController.getYRange())
+      );
   }
 
 }
@@ -172,8 +195,11 @@ void sendToPC(const unsigned char x, const unsigned char y){
 }
 
 unsigned char convertToSendRange(const long motorStepNum, const long motorStepRange){
-  const char SEND_RANGE = 255;
   return motorStepNum * SEND_RANGE / motorStepRange;
+}
+
+long convertToMotorStepRange(const unsigned char recvPosition, const long motorStepNumRange){
+  return recvPosition * motorStepNumRange /SEND_RANGE;
 }
 
 void toggleLED(){

@@ -80,6 +80,8 @@ public:
     long getTimerPeriodForY();
     long getXRange();
     long getYRange();
+    long getPositionXStep();
+    long getPositionYStep();
     //目標地点追従用
     void setTargetPoint(long x, long y);
     void toggleXPulseAndUpdatePosition();
