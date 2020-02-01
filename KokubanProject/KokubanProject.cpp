@@ -1,6 +1,10 @@
 ﻿#include <opencv2/opencv.hpp>
 #include "kokubanCV.h"
 
+#include "KokubanProject.h"
+
+#include "Eraser/EraserManager.inl"
+
 /// <summary>
 /// 画像を2値化する（仮）
 /// </summary>
@@ -183,8 +187,45 @@ void testChalk() {
 
 int main()
 {
-	testChalk();
+	//testChalk();
+	Initialize();
+
+	Update();
+
 	std::string x;
 	std::cin >> x;
+	delete(eraserManager);
 	cv::destroyAllWindows();
+}
+
+void Initialize()
+{
+	eraserManager = new Eraser::EraserManager();
+
+	// ここをwebカメラからの映像にする
+	inputImage = cv::imread("kokuban.jpg", cv::IMREAD_UNCHANGED);
+}
+
+void Update()
+{
+
+	while (true)
+	{
+		if (inputImage.empty() == true) {
+			// 画像データが読み込めなかったときは終了する
+			std::cout << "Error : failed read img" << std::endl;
+			break;
+		}
+		else {
+			cv::Mat frame = kokubanCV::binary(inputImage);// color_to_binary(input_img, 128);
+			chalks = kokubanCV::pulledOutChalkOnKokuban(frame);
+			//cv::imshow("binary", frame);//画像を表示
+			inputImage = frame;
+			//cv::waitKey(1);
+		}
+		eraserManager->chalkPoints = chalks;
+
+		eraserManager->Update();
+		eraserManager->DebugDraw(inputImage);
+	}
 }

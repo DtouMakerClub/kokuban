@@ -5,28 +5,52 @@
     <ClCompile Include="KokubanProject.cpp" />
     <ClCompile Include="SerialWrapper.cpp" />
     <ClCompile Include="KokubanSerial.cpp" />
+    <ClCompile Include="test_ayataka.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ayataka\AreaMoveState.h" />
-    <ClInclude Include="ayataka\EraserManager.h" />
-    <ClInclude Include="ayataka\EraserStateBase.h" />
-    <ClInclude Include="ayataka\PointMoveState.h" />
     <ClInclude Include="ayataka\RectangleDetection.h" />
     <ClInclude Include="kokubanCV.h" />
     <ClInclude Include="SerialWrapper.h" />
     <ClInclude Include="KokubanSerial.h" />
+    <ClInclude Include="Eraser\AreaMoveState.h">
+      <Filter>Eraser</Filter>
+    </ClInclude>
+    <ClInclude Include="Eraser\EraserManager.h">
+      <Filter>Eraser</Filter>
+    </ClInclude>
+    <ClInclude Include="Eraser\EraserStateBase.h">
+      <Filter>Eraser</Filter>
+    </ClInclude>
+    <ClInclude Include="Eraser\PointMoveState.h">
+      <Filter>Eraser</Filter>
+    </ClInclude>
+    <ClInclude Include="test_ayataka.h" />
+    <ClInclude Include="KokubanProject.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="sample.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ayataka\AreaMoveState.inl" />
-    <None Include="ayataka\EraserManager.inl" />
-    <None Include="ayataka\EraserStateBase.inl" />
-    <None Include="ayataka\PointMoveState.inl" />
     <None Include="ayataka\RectangleDetection.inl" />
+    <None Include="Eraser\AreaMoveState.inl">
+      <Filter>Eraser</Filter>
+    </None>
+    <None Include="Eraser\EraserManager.inl">
+      <Filter>Eraser</Filter>
+    </None>
+    <None Include="Eraser\EraserStateBase.inl">
+      <Filter>Eraser</Filter>
+    </None>
+    <None Include="Eraser\PointMoveState.inl">
+      <Filter>Eraser</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Eraser">
+      <UniqueIdentifier>{a0388cbc-3a19-4fb7-b140-0b8b5d361643}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
