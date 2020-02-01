@@ -181,15 +181,23 @@ void testChalk() {
 	}
 }
 
+/// <summary>
+/// 参考
+/// 透視変換 https://cvtech.cc/homography/
+/// マウス取得 http://whitecat-student.hatenablog.com/entry/2016/11/09/223230
+/// </summary>
 void  testMouse() {
-	cv::Mat input_img = cv::imread("kokuban.jpg", cv::IMREAD_UNCHANGED);
+	std::string image_name = "kokuuchi350";
+	cv::Mat input_img = cv::imread(image_name + ".jpg", cv::IMREAD_UNCHANGED);
 	if (input_img.empty() == true) {
 		// 画像データが読み込めなかったときは終了する
 		std::cout << "Error : failed read img" << std::endl;
 	}
 	else {
 		kokubanCV::mouseParam mouse;
-		cv::Mat frame = input_img;
+		cv::Mat frame;
+		cv::Size size = { 1280, 720 };
+		cv::resize(input_img, frame, cv::Size(int(input_img.cols * 0.25), int(input_img.rows * 0.25)));
 		cv::imshow("binary", frame);//画像を表示
 		cv::setMouseCallback("binary", kokubanCV::mouseCallback, &mouse);
 		int width = frame.cols;
@@ -214,15 +222,15 @@ void  testMouse() {
 				// 左上、左下、右上、右下の順で入力
 				src_pt[i] = cv::Point2f(mouse.x, mouse.y);
 				++i;
-				cv::waitKey(100);
+				cv::waitKey(200);
 			}
 			//4点クリックで終了
 			else if (i>=4) {
 				cv::Mat homography_matrix = getPerspectiveTransform(src_pt, dst_pt);
 				warpPerspective(frame, dst, homography_matrix, dst.size());
 				imshow("result", dst);
-				imwrite("field_out.png", dst);
-				cv::waitKey(20);
+				imwrite( image_name + "kai.jpg", dst);
+				cv::waitKey(50);
 				break;
 			}
 		}
