@@ -164,6 +164,7 @@
     <ClCompile Include="KokubanProject.cpp" />
     <ClCompile Include="KokubanSerial.cpp" />
     <ClCompile Include="SerialWrapper.cpp" />
+    <ClCompile Include="test_ayataka.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -172,21 +173,23 @@
     <Image Include="sample.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ayataka\AreaMoveState.inl" />
-    <None Include="ayataka\EraserManager.inl" />
-    <None Include="ayataka\EraserStateBase.inl" />
-    <None Include="ayataka\PointMoveState.inl" />
     <None Include="ayataka\RectangleDetection.inl" />
+    <None Include="Eraser\AreaMoveState.inl" />
+    <None Include="Eraser\EraserManager.inl" />
+    <None Include="Eraser\EraserStateBase.inl" />
+    <None Include="Eraser\PointMoveState.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ayataka\AreaMoveState.h" />
-    <ClInclude Include="ayataka\EraserManager.h" />
-    <ClInclude Include="ayataka\EraserStateBase.h" />
-    <ClInclude Include="ayataka\PointMoveState.h" />
     <ClInclude Include="ayataka\RectangleDetection.h" />
+    <ClInclude Include="Eraser\AreaMoveState.h" />
+    <ClInclude Include="Eraser\EraserManager.h" />
+    <ClInclude Include="Eraser\EraserStateBase.h" />
+    <ClInclude Include="Eraser\PointMoveState.h" />
     <ClInclude Include="kokubanCV.h" />
+    <ClInclude Include="KokubanProject.h" />
     <ClInclude Include="KokubanSerial.h" />
     <ClInclude Include="SerialWrapper.h" />
+    <ClInclude Include="test_ayataka.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

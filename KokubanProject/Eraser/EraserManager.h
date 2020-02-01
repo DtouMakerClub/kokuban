@@ -22,9 +22,14 @@ namespace Eraser
 		void Update();
 
 		void UpdateMove();
+		void DebugDraw(cv::Mat img);
 
-		int const heightSection = 3;
-		int const widthSection = 3;
+		cv::Point2i const CAMERA_RESOLUTION = cv::Point2i(1478, 1108);
+		// 上の解像度だと100ピクセルぐらいがちょうどいいので0.1%	
+		float const MOVE_RATE = 0.001f;					
+
+		int const HEIGHT_SECTION = 3;
+		int const WIDTH_SECTION = 3;
 
 		cv::Point2i GetEraserPos() { return m_eraserPos; }
 		int GetAreaIndex() { return m_nowAreaIndex; }
@@ -48,11 +53,15 @@ namespace Eraser
 		int PointToArea(cv::Point2i pos);
 		// エリアの重みを計算
 		void CulcurateArea();
+		// 指令値を割合に変換する
+		cv::Point2i PointToRatio(cv::Point2i pos);
+		// 2点間の距離を求める
+		float GetDistance(cv::Point p1, cv::Point p2);
 
-		cv::Point2i m_eraserPos;			// 現在位置(x,y)
 		int m_areaWeight[9];				// 各エリアの重み
 		int m_nowAreaIndex;					// 自分の位置エリア
-		cv::Point2i m_nowPoint;				// 自分の位置座標
+		cv::Point2i m_eraserPos;				// 自分の位置座標
+		cv::Point2i m_prevPos;				// 自分の位置座標
 		int m_targetIndex;					// 目標位置のエリア
 		cv::Point2i m_targetPoint;			// 目標位置の座標
 
