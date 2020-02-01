@@ -185,17 +185,33 @@ void testChalk() {
 	}
 }
 
+
+void  testMouse() {
+	std::string image_name = "kokuuchi350";
+	cv::Mat input_img = cv::imread(image_name + ".jpg", cv::IMREAD_UNCHANGED);
+	if (input_img.empty() == true) {
+		// 画像データが読み込めなかったときは終了する
+		std::cout << "Error : failed read img" << std::endl;
+	}
+	else {
+		cv::Mat frame = kokubanCV::clickPointPerspectiveTransformation(input_img);
+		a = kokubanCV::pulledOutChalkOnKokuban(frame);
+		cv::imshow("binary", kokubanCV::binary(frame, 160));//画像を表示
+		cv::waitKey(1);
+	}
+}
+
 int main()
 {
 	//testChalk();
 	Initialize();
 
 	Update();
-
 	std::string x;
 	std::cin >> x;
 	delete(eraserManager);
 	cv::destroyAllWindows();
+	return 0;
 }
 
 void Initialize()

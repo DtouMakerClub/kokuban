@@ -1,7 +1,16 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 
+
 namespace kokubanCV {
+	//マウス入力用のパラメータ
+	struct mouseParam {
+		int x;
+		int y;
+		int event;
+		int flags;
+	};
+
 
 	/// <summary>
 	/// 黒板上のチョークで書かれた位置を特定
@@ -20,9 +29,21 @@ namespace kokubanCV {
 /// </summary>
 /// <param name="img">カラー画像</param>
 /// <param name=" threshold">2値化時の閾値</param>
-/// <returns></returns>
+/// <returns>2値化した画像</returns>
 	cv::Mat binary(cv::Mat img, int threshold = 128);
 	
+	/// <summary>
+	/// 画像の内の4点をクリックで指定して、透視変換を行う
+	/// 4点は左上、左下、右上、右下の順でクリックする
+	/// 透視変換後の切り抜き画像を返す
+	///  参考
+    /// 透視変換 https://cvtech.cc/homography/
+    /// マウス取得 http://whitecat-student.hatenablog.com/entry/2016/11/09/223230
+	/// </summary>
+	cv::Mat clickPointPerspectiveTransformation(cv::Mat image);
+
+	void mouseCallback(int event, int x, int y, int flags, void* userdata);
+
 	cv::VideoCapture openVideoFile(std::string video_name);
 	template <class Fn> void funcVideo(std::string video_name, std::string save_file_name, Fn fn);
 
