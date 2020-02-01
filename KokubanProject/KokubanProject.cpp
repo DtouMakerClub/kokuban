@@ -181,11 +181,7 @@ void testChalk() {
 	}
 }
 
-/// <summary>
-/// 参考
-/// 透視変換 https://cvtech.cc/homography/
-/// マウス取得 http://whitecat-student.hatenablog.com/entry/2016/11/09/223230
-/// </summary>
+
 void  testMouse() {
 	std::string image_name = "kokuuchi350";
 	cv::Mat input_img = cv::imread(image_name + ".jpg", cv::IMREAD_UNCHANGED);
@@ -194,46 +190,10 @@ void  testMouse() {
 		std::cout << "Error : failed read img" << std::endl;
 	}
 	else {
-		kokubanCV::mouseParam mouse;
-		cv::Mat frame;
-		cv::Size size = { 1280, 720 };
-		cv::resize(input_img, frame, cv::Size(int(input_img.cols * 0.25), int(input_img.rows * 0.25)));
-		cv::imshow("binary", frame);//画像を表示
-		cv::setMouseCallback("binary", kokubanCV::mouseCallback, &mouse);
-		int width = frame.cols;
-		int height = frame.rows;
-
-		cv::Point2f src_pt[4] = {};
-		const cv::Point2f dst_pt[4] = {
-					cv::Point2f(50,							 50),
-					cv::Point2f(50,							 50 + height - 1),
-					cv::Point2f(50 + width - 1,       50),
-					cv::Point2f(50 + width - 1,       50 + height - 1) };
-
-		int i = 0;
-		cv::Mat dst = cv::Mat::zeros(height + 100, width + 100, CV_8UC3);
-
-		while (1) {
-			cv::waitKey(2);
-			//左クリックした座標を取得
-			if (mouse.event == cv::EVENT_LBUTTONDOWN && i <= 4) {
-				//クリック後のマウスの座標を出力
-				std::cout << mouse.x << " , " << mouse.y << std::endl;
-				// 左上、左下、右上、右下の順で入力
-				src_pt[i] = cv::Point2f(mouse.x, mouse.y);
-				++i;
-				cv::waitKey(200);
-			}
-			//4点クリックで終了
-			else if (i>=4) {
-				cv::Mat homography_matrix = getPerspectiveTransform(src_pt, dst_pt);
-				warpPerspective(frame, dst, homography_matrix, dst.size());
-				imshow("result", dst);
-				imwrite( image_name + "kai.jpg", dst);
-				cv::waitKey(50);
-				break;
-			}
-		}
+		cv::Mat frame = kokubanCV::clickPointPerspectiveTransformation(input_img);
+		a = kokubanCV::pulledOutChalkOnKokuban(frame);
+		cv::imshow("binary", kokubanCV::binary(frame, 160));//画像を表示
+		cv::waitKey(1);
 	}
 }
 
