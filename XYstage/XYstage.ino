@@ -133,6 +133,8 @@ void loop() {
       Serial.print(motorController.getYRange(),DEC);
       Serial.print('\n');
 
+
+
       state = MOVE;
     }
     else if(receiveData.getCommand() == 'M'){
@@ -158,7 +160,7 @@ void loop() {
   }
 
   //指令位置へ動作するための速度計算等（の予定）
-  if(motorController.isCalibFinished()){
+  if(motorController.hasCalibFinished()){
 
     if(state == MOVE){
       //
@@ -170,7 +172,7 @@ void loop() {
   }
 
   //現在位置の送信
-  if(motorController.isCalibFinished()){
+  if(motorController.hasCalibFinished()){
     sendToPC(
       convertToSendRange(motorController.getPositionXStep(),motorController.getXRange()),
       convertToSendRange(motorController.getPositionYStep(),motorController.getYRange())

@@ -74,7 +74,7 @@ private:
 public:
     void pinSetup();
     void calibration();
-    bool isCalibFinished();
+    bool hasCalibFinished();
     int setXSpeedToTarget();
     long getTimerPeriodForX();
     long getTimerPeriodForY();

@@ -199,7 +199,7 @@ void MotorController::calibration()
     calibFinished = true;
 }
 
-bool MotorController::isCalibFinished()
+bool MotorController::hasCalibFinished()
 {
     return calibFinished;
 }
