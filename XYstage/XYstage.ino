@@ -2,6 +2,8 @@
 #include <TimerOne.h>
 #include "ellipsetable.hpp"
 
+//#define DEBUG
+
 
 const int DATA_LENGHT_INIT = 2;
 const int DATA_LENGHT_MOVE = 4;
@@ -63,7 +65,9 @@ MotorController motorController = MotorController();
 
 void setup() {
   Serial.begin(9600);
+  #ifdef DEBUG
   Serial.print("This is XYstage.ino\n");
+  #endif //DEBUG
 
   motorController.pinSetup();
   pinMode(LED_BUILTIN,OUTPUT);
@@ -103,8 +107,8 @@ void loop() {
         if (inputString.length() == DATA_LENGHT_MOVE)
         {
           receiveData.setCommand('M');
-          receiveData.setX(inputString[1]);
-          receiveData.setY(inputString[2]);
+          receiveData.setX(inputString[2]);//カメラとxyステージでx,y軸が入れかわっているのでつじつまを合わせる
+          receiveData.setY(inputString[1]);
           commandReceived = true;
         }
       }
@@ -123,16 +127,18 @@ void loop() {
 
   if(commandReceived){
     if(receiveData.getCommand() == 'I' ){
+      #ifdef DEBUG
       Serial.print("start calibration\n");
-      
+      #endif //DEBUG
       motorController.calibration();
 
+      #ifdef DEBUG
       Serial.print("X range : ");
       Serial.print(motorController.getXRange(),DEC);
       Serial.print("\nY range : ");
       Serial.print(motorController.getYRange(),DEC);
       Serial.print('\n');
-
+      #endif //DEBUG
 
 
       state = MOVE;
@@ -173,9 +179,9 @@ void loop() {
 
   //現在位置の送信
   if(motorController.hasCalibFinished()){
-    sendToPC(
-      convertToSendRange(motorController.getPositionXStep(),motorController.getXRange()),
-      convertToSendRange(motorController.getPositionYStep(),motorController.getYRange())
+    sendToPC(  //カメラとxyステージでx,y軸が入れかわっているのでつじつまを合わせる
+      convertToSendRange(motorController.getPositionYStep(),motorController.getYRange()),
+      convertToSendRange(motorController.getPositionXStep(),motorController.getXRange())
       );
   }
 
