@@ -196,6 +196,11 @@ void MotorController::calibration()
         rangeY++;
         delayMicroseconds(HALF_PERIOD_OF_PULSE_MICROSEC);
     } //Y終了
+
+    //現在位置のリセット
+    positionXStep = 0;
+    positionYStep = 0;
+
     calibFinished = true;
 }
 
