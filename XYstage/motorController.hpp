@@ -27,10 +27,6 @@ private:
     const bool Y_PLUS = HIGH;
     const bool Y_MINUS = !Y_PLUS;
 
-    //XY table size mm
-    const long actualRangeXmm = 0;
-    const long actualRangeYmm = 0;
-
     //motor pulse
     bool pulseStateX = 0;
     bool pulseStateY = 0;
@@ -44,12 +40,6 @@ private:
     long speedYHz = 15000;
     long periodXUS = 1000000 / speedXHz;//単位時間/周波数　-> 周期 これをタイマの周期とする
     long periodYUS = 1000000 / speedYHz;
-
-    //position mm
-    long positionXmm = 0;
-    long positionYmm = 0;
-    long targetXmm = 0;
-    long targetYmm = 0;
 
     //キャリブレーション用
     bool calibFinished = false;

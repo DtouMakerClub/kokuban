@@ -4,7 +4,6 @@
 
 //#define DEBUG
 
-
 const int DATA_LENGHT_INIT = 2;
 const int DATA_LENGHT_MOVE = 4;
 const int DATA_LENGHT_FREEZE = 2;
@@ -127,9 +126,11 @@ void loop() {
 
   if(commandReceived){
     if(receiveData.getCommand() == 'I' ){
+
       #ifdef DEBUG
       Serial.print("start calibration\n");
       #endif //DEBUG
+
       motorController.calibration();
 
       #ifdef DEBUG
@@ -139,7 +140,6 @@ void loop() {
       Serial.print(motorController.getYRange(),DEC);
       Serial.print('\n');
       #endif //DEBUG
-
 
       state = MOVE;
     }
