@@ -135,6 +135,9 @@ void test_Capture() {
 	writer.open("koku.mp4", fourcc, fps, cv::Size(width, height));
 
 	cv::Mat frame, dst;
+	cv::Point2f src_pt[4] = {};
+	bool flag = true;
+
 
 	while (true) {
 
@@ -144,8 +147,14 @@ void test_Capture() {
 			break;
 		}
 
+		if (flag) {
+			kokubanCV::returnClickPoints(frame, src_pt);
+			cv::waitKey(2000);
+			flag = false;
+		}
+
 		//何か処理をする
-		dst = kokubanCV::binary(frame);
+		dst = kokubanCV::clickPointPerspectiveTransformation(frame, src_pt);
 
 		//cv::imshow("変換中", dst);
 		//std::cout << "処理中" << std::endl;
@@ -194,22 +203,22 @@ void  testMouse() {
 		std::cout << "Error : failed read img" << std::endl;
 	}
 	else {
-		cv::Mat frame = kokubanCV::clickPointPerspectiveTransformation(input_img);
-		a = kokubanCV::pulledOutChalkOnKokuban(frame);
-		cv::imshow("binary", kokubanCV::binary(frame, 160));//画像を表示
+		//cv::Mat frame = kokubanCV::clickPointPerspectiveTransformation(input_img);
+		//a = kokubanCV::pulledOutChalkOnKokuban(frame);
+		//cv::imshow("binary", kokubanCV::binary(frame, 160));//画像を表示
 		cv::waitKey(1);
 	}
 }
 
 int main()
 {
-	//testChalk();
-	Initialize();
+	test_Capture();
+	//Initialize();
 
-	Update();
+	//Update();
 	std::string x;
 	std::cin >> x;
-	delete(eraserManager);
+	//delete(eraserManager);
 	cv::destroyAllWindows();
 	return 0;
 }
@@ -224,6 +233,9 @@ void Initialize()
 
 void Update()
 {
+	cv::Point2f src_pt[4] = {};
+	kokubanCV::returnClickPoints(inputImage, src_pt);
+	cv::waitKey(2000);
 
 	while (true)
 	{
@@ -233,7 +245,7 @@ void Update()
 			break;
 		}
 		else {
-			cv::Mat frame = kokubanCV::binary(inputImage);// color_to_binary(input_img, 128);
+			cv::Mat frame = kokubanCV::clickPointPerspectiveTransformation(inputImage, src_pt);// color_to_binary(input_img, 128);
 			chalks = kokubanCV::pulledOutChalkOnKokuban(frame);
 			//cv::imshow("binary", frame);//画像を表示
 			inputImage = frame;
