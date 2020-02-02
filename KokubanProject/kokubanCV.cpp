@@ -56,26 +56,37 @@ namespace kokubanCV {
 		return binary_img;
 	}
 
-	cv::Mat clickPointPerspectiveTransformation(cv::Mat input_img)
+	cv::Mat clickPointPerspectiveTransformation(cv::Mat input_image, cv::Point2f click_point[4])
 	{
 		kokubanCV::mouseParam mouse;
-		cv::Mat frame;
-		cv::Size size = { int(input_img.cols * 0.25), int(input_img.rows * 0.25)};
-		cv::resize(input_img, frame, size);
-		cv::imshow("input_image", frame);//画像を表示
-		cv::setMouseCallback("input_image", kokubanCV::mouseCallback, &mouse);
+		cv::Mat frame = input_image;
+		//cv::Size size = { int(input_image.cols * 0.5), int(input_image.rows * 0.5)};
+		//cv::resize(input_image, frame, size);
 		int width = frame.cols;
 		int height = frame.rows;
 
-		cv::Point2f src_pt[4] = {};
 		const cv::Point2f dst_pt[4] = {
-					cv::Point2f(50,							 50),
-					cv::Point2f(50,							 50 + height - 1),
-					cv::Point2f(50 + width - 1,       50),
-					cv::Point2f(50 + width - 1,       50 + height - 1) };
+					cv::Point2f(0,						  0),
+					cv::Point2f(0,						  0 + height - 1),
+					cv::Point2f(0 + width ,       0),
+					cv::Point2f(0 + width ,       0 + height ) };
 
 		int i = 0;
-		cv::Mat dst = cv::Mat::zeros(height + 100, width + 100, CV_8UC3);
+		cv::Mat dst = cv::Mat::zeros(height, width, CV_8UC3);
+
+		cv::Mat homography_matrix = getPerspectiveTransform(click_point, dst_pt);
+		warpPerspective(frame, dst, homography_matrix, dst.size());
+		return dst;
+	}
+
+	void returnClickPoints(cv::Mat input_image, cv::Point2f point[4])
+	{
+		kokubanCV::mouseParam mouse;
+		cv::Mat frame = input_image;
+		cv::imshow("input_image", frame);//画像を表示
+		cv::setMouseCallback("input_image", kokubanCV::mouseCallback, &mouse);
+
+		int i = 0;
 
 		std::cout << "click point 4 times" << std::endl;
 		while (1) {
@@ -85,21 +96,16 @@ namespace kokubanCV {
 				//クリック後のマウスの座標を出力
 				std::cout << mouse.x << " , " << mouse.y << std::endl;
 				// 左上、左下、右上、右下の順で入力
-				src_pt[i] = cv::Point2f(mouse.x, mouse.y);
+				point[i] = cv::Point2f(mouse.x, mouse.y);
 				++i;
 				cv::waitKey(200);
 			}
 			//4点クリックで終了
-			else if (i >= 4) {
-				cv::Mat homography_matrix = getPerspectiveTransform(src_pt, dst_pt);
-				warpPerspective(frame, dst, homography_matrix, dst.size());
-				imshow("result", dst);
-				cv::waitKey(500);
+			else if( i >= 4){
+				cv::destroyAllWindows();
 				break;
 			}
 		}
-		cv::destroyAllWindows();
-		return dst;
 	}
 
 
