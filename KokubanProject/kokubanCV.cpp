@@ -21,7 +21,7 @@ namespace kokubanCV {
 				}
 			}
 		}
-		std::cout << chalkPoints.size() <<   std::endl;
+		//std::cout << chalkPoints.size() <<   std::endl;
 
 		//’Šo‚µ‚½“_ŒQ‚ÌÀ•W‚ð•Ô‚·
 		return chalkPoints;
