@@ -3,6 +3,7 @@
 #include <opencv2\opencv.hpp>
 
 #include "EraserStateBase.h"
+#include "../KokubanSerial.h"
 
 namespace Eraser 
 {
@@ -23,13 +24,16 @@ namespace Eraser
 
 		void UpdateMove();
 		void DebugDraw(cv::Mat img);
+		void DebugSimulate();
 
-		cv::Point2i const CAMERA_RESOLUTION = cv::Point2i(1478, 1108);
+		cv::Point2i const CAMERA_RESOLUTION = cv::Point2i(640, 480);
 		// 上の解像度だと100ピクセルぐらいがちょうどいいので0.1%	
 		float const MOVE_RATE = 0.001f;					
 
 		int const HEIGHT_SECTION = 3;
 		int const WIDTH_SECTION = 3;
+
+		KokubanSerial* serialCommnad = nullptr;
 
 		cv::Point2i GetEraserPos() { return m_eraserPos; }
 		int GetAreaIndex() { return m_nowAreaIndex; }
@@ -43,10 +47,8 @@ namespace Eraser
 		// 自身の位置に最近傍の点を取得する
 		cv::Point2i FindNearest(int index);
 		void UpdateState();
-		// 現在位置の受信(xyステージとの)
-		cv::Point2i ReceivePosition();
 		// 目標位置の送信
-		bool SendTargetPosition();
+		void SendTargetPosition();
 		// エリアインデックス→座標の変換
 		cv::Point2i AreaToPoint(int index);
 		// 座標→エリアインデックスの変換
@@ -55,6 +57,8 @@ namespace Eraser
 		void CulcurateArea();
 		// 指令値を割合に変換する
 		cv::Point2i PointToRatio(cv::Point2i pos);
+		// 送られてきた割合をピクセルに変換する
+		cv::Point2i RatioToPoint(cv::Point2i ratio);
 		// 2点間の距離を求める
 		float GetDistance(cv::Point p1, cv::Point p2);
 

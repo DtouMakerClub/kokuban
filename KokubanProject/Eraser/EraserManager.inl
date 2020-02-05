@@ -1,24 +1,26 @@
 ﻿#include "EraserManager.h"
 
-
 namespace Eraser
 {
 	EraserManager::EraserManager()
 	{
 		m_state = EraserMoveState::READY;
 		
-		m_eraserPos = cv::Point2i(20, 20);
+		m_eraserPos = cv::Point2i(CAMERA_RESOLUTION.x / 2, CAMERA_RESOLUTION.y / 2);
+		m_prevPos = m_eraserPos;
+		serialCommnad = new KokubanSerial(4);
+
+		// XYステージのキャリブレーション命令
+		serialCommnad->start();
 	}
 
 	EraserManager::~EraserManager()
 	{
-
+		delete(serialCommnad);
 	}
 
 	void EraserManager::Update()
 	{
-		// 現在位置の受信
-		//m_eraserPos = ReceivePosition();
 
 		// 目標位置の更新処理
 		UpdateMove();
@@ -26,23 +28,12 @@ namespace Eraser
 		// 各状態の更新処理
 		UpdateState();
 
-		// デバッグ用
+		// 値の送信
+		//SendTargetPosition();
 
-		// 目的地の送信
-		if (SendTargetPosition() == true)
-		{
-			//std::cout << "送信に成功" << std::endl;
-		}
-		else
-		{
-			std::cout << "送信に失敗しました。" << std::endl;
-		}
+		// デバッグ用環境
+		//DebugSimulate();
 
-		m_nowAreaIndex = PointToArea(m_eraserPos);
-		cv::Point2i vec = m_targetPoint - m_eraserPos;
-		vec /= cv::norm(vec);
-		m_prevPos = m_eraserPos;
-		m_eraserPos += vec * 2;
 	}
 
 	void EraserManager::UpdateMove()
@@ -50,9 +41,7 @@ namespace Eraser
 		switch (m_state)
 		{
 		case EraserMoveState::READY:
-			// ここでInit処理を行うつもり
-			m_state = EraserMoveState::AREA;
-			CulcurateArea();
+			return;
 			break;
 		case EraserMoveState::AREA:
 			// 移動するためのエリアを選出
@@ -65,6 +54,10 @@ namespace Eraser
 		default:
 			break;
 		}
+
+		cv::Point ratio = serialCommnad->readMessage(m_eraserPos);
+		m_eraserPos = RatioToPoint(ratio);
+		std::cout << m_eraserPos << std::endl;
 	}
 
 	inline void EraserManager::DebugDraw(cv::Mat img)
@@ -88,21 +81,23 @@ namespace Eraser
 			break;
 		}
 
-		cv::rectangle(img, m_eraserPos, m_eraserPos + p1, color, 10, cv::LINE_4);
+		// 黒板消しの位置
+		//cv::rectangle(img, m_eraserPos, m_eraserPos + p1, cv::Scalar(0, 0, 0), 10, cv::LINE_4);
+		cv::circle(img, m_eraserPos, 10, cv::Scalar(0, 0, 255));
 
 		// 目的地
-		//cv::rectangle(img, m_targetPoint, m_targetPoint + cv::Point(5, 5), cv::Scalar(0, 0, 255), 1, cv::LINE_4);
+		cv::rectangle(img, m_targetPoint, m_targetPoint + cv::Point(5, 5), cv::Scalar(255, 0, 255), 1, cv::LINE_4);
 
 		// エリアわけライン
-		cv::Point x1_line(CAMERA_RESOLUTION.x / 3, 0);
-		cv::Point x2_line((CAMERA_RESOLUTION.x / 3) * 2, 0);
-		cv::Point y1_line(0, CAMERA_RESOLUTION.y / 3);
-		cv::Point y2_line(0, (CAMERA_RESOLUTION.y / 3) * 2);
+		//cv::Point x1_line(CAMERA_RESOLUTION.x / 3, 0);
+		//cv::Point x2_line((CAMERA_RESOLUTION.x / 3) * 2, 0);
+		//cv::Point y1_line(0, CAMERA_RESOLUTION.y / 3);
+		//cv::Point y2_line(0, (CAMERA_RESOLUTION.y / 3) * 2);
 
-		cv::line(img, x1_line, x1_line + cv::Point(0, CAMERA_RESOLUTION.y), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
-		cv::line(img, x2_line, x2_line + cv::Point(0, CAMERA_RESOLUTION.y), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
-		cv::line(img, y1_line, y1_line + cv::Point(CAMERA_RESOLUTION.x, 0), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
-		cv::line(img, y2_line, y2_line + cv::Point(CAMERA_RESOLUTION.x, 0), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
+		//cv::line(img, x1_line, x1_line + cv::Point(0, CAMERA_RESOLUTION.y), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
+		//cv::line(img, x2_line, x2_line + cv::Point(0, CAMERA_RESOLUTION.y), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
+		//cv::line(img, y1_line, y1_line + cv::Point(CAMERA_RESOLUTION.x, 0), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
+		//cv::line(img, y2_line, y2_line + cv::Point(CAMERA_RESOLUTION.x, 0), cv::Scalar(255, 0, 0), 5, cv::LINE_AA);
 
 		// チョーク
 		//for (auto chalk : chalks)
@@ -118,6 +113,15 @@ namespace Eraser
 		cv::imshow("test", img);
 		cv::waitKey(1);
 	
+	}
+
+	inline void EraserManager::DebugSimulate()
+	{
+		m_nowAreaIndex = PointToArea(m_eraserPos);
+		cv::Point2i vec = m_targetPoint - m_eraserPos;
+		vec /= cv::norm(vec);
+		m_prevPos = m_eraserPos;
+		m_eraserPos += vec * 2;
 	}
 
 	inline cv::Point2i EraserManager::FindNearest(int index)
@@ -144,37 +148,43 @@ namespace Eraser
 	}
 	inline void EraserManager::UpdateState()
 	{
-		// 現エリアの重みが小さくなったら
-		//if (m_areaWeight[m_nowAreaIndex] < ((CAMERA_RESOLUTION.x * CAMERA_RESOLUTION.y) / 9) * MOVE_RATE)
-		// ある一定の近さにチョークがなかったら
-		if (GetDistance(m_targetPoint, m_eraserPos) > 200.0f)
+		if (m_state == EraserMoveState::READY)
 		{
-			m_state = EraserMoveState::AREA;
-			CulcurateArea();
+			if (serialCommnad->checkRead())
+			{
+				m_state = EraserMoveState::POINT;
+			}
 		}
-
-		// エリアの移動が完了したら
-		else if (m_nowAreaIndex == m_targetIndex)
+		else
 		{
-			m_state = EraserMoveState::POINT;
-			//CulcurateArea();
-			m_targetIndex = std::rand() % 9;//TargetAreaCheck();
+			// 現エリアの重みが小さくなったら
+			//if (m_areaWeight[m_nowAreaIndex] < ((CAMERA_RESOLUTION.x * CAMERA_RESOLUTION.y) / 9) * MOVE_RATE)
+			// ある一定の近さにチョークがなかったら
+			if (GetDistance(m_targetPoint, m_eraserPos) > 200.0f)
+			{
+				m_state = EraserMoveState::AREA;
+				//CulcurateArea();
+			}
+
+			// エリアの移動が完了したら
+			else if (m_nowAreaIndex == m_targetIndex)
+			{
+				m_state = EraserMoveState::POINT;
+				//CulcurateArea();
+				m_targetIndex = std::rand() % 9;//TargetAreaCheck();
+			}
 		}
 	}
 
-	cv::Point2i EraserManager::ReceivePosition()
+	inline void EraserManager::SendTargetPosition()
 	{
-		cv::Point2i postion;
-
-		return postion;
-	}
-
-	inline bool EraserManager::SendTargetPosition()
-	{
+		cv::Point2i sendPoint;
+		sendPoint = PointToRatio(m_targetPoint);
+		
 		// 送信するときに自分の位置に近すぎる座標は省く
 
-		// 送信に失敗したとき
-		return true;
+		serialCommnad->sendMessage(sendPoint.x, sendPoint.y);
+
 	}
 
 	inline int EraserManager::TargetAreaCheck()
@@ -280,6 +290,7 @@ namespace Eraser
 			m_areaWeight[i] = 0;
 		}
 
+		// 各エリアの白ドットの数を数えて重みとしている
 		for (auto chalk : chalkPoints)
 		{
 			int area = PointToArea(chalk);
@@ -290,11 +301,34 @@ namespace Eraser
 	{
 		cv::Point2i result;
 
+		// 送信用の仕様が0~255なのでそれに合わせている
 		result.x = (pos.x / CAMERA_RESOLUTION.x) * 255;
 		result.y = (pos.y / CAMERA_RESOLUTION.y) * 255;
 
 		return result;
 	}
+
+	inline cv::Point2i EraserManager::RatioToPoint(cv::Point2i ratio)
+	{
+		cv::Point2f result;
+
+		// 受信用の値が0~255なのでピクセル表記に変換する
+		result.x = ratio.x * CAMERA_RESOLUTION.x / 255.0f;
+		result.y = ratio.y * CAMERA_RESOLUTION.y / 255.0f;
+
+		if (result.x > CAMERA_RESOLUTION.x)
+		{
+			result.x = CAMERA_RESOLUTION.x;
+		}
+
+		if (result.y > CAMERA_RESOLUTION.y)
+		{
+			result.y = CAMERA_RESOLUTION.y;
+		}
+
+		return result;
+	}
+
 	inline float EraserManager::GetDistance(cv::Point p1, cv::Point p2)
 	{
 		return static_cast<float>(cv::norm(p1 - p2));;
