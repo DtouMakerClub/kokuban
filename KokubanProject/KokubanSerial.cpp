@@ -29,14 +29,34 @@ void KokubanSerial::sendMessage(uchar x, uchar y)
 	write(message, 4);
 }
 
-cv::Point KokubanSerial::readMessage()
+bool KokubanSerial::checkRead()
+{
+	char head = read();
+	if (head == receive_message)
+	{
+		return true;
+	}
+	return false;
+}
+
+cv::Point KokubanSerial::readMessage(cv::Point prev)
 {
 	cv::Point point;
-	if ( move_message == read()) {
-		point.x = read();
-		point.y = read();
+	if ( receive_message == read() ) 
+	{
+		point.x = static_cast<int>(read());
+		point.y = static_cast<int>(read());
 	}
-	return point;
+
+	// ‚È‚º‚©³‚µ‚¢’l‚Æˆê‚É(0,0)‚ª‘—‚ç‚ê‚Ä‚­‚é‚Ì‚Å‘ÎÇ—Ã–@“I‚É‘Î‰
+	if (point == cv::Point(0, 0))
+	{
+		return prev;
+	}
+	else
+	{
+		return point;
+	}
 }
 
 void KokubanSerial::stop()
