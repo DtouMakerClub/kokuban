@@ -68,15 +68,15 @@ int SerialWrapper::available()
 	return lengthOfRecieved;
 }
 
-char SerialWrapper::read()
+unsigned char SerialWrapper::read()
 {
 	//受信データがない場合は読み込まない
 	if (available() < 1)
 	{
-		return -1;
+		return 0;
 	}
 
-	char buf[1]; // 受信データ格納用
+	unsigned char buf[1]; // 受信データ格納用
 	DWORD numberOfRead; // 実際に受信したバイト数
 
 	//データ受信
@@ -84,7 +84,7 @@ char SerialWrapper::read()
 
 	if (result == FALSE)
 	{
-		return -1;
+		return 0;
 	}
 	else
 	{

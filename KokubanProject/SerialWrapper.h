@@ -36,7 +36,7 @@ public:
 
 	// 受信バッファから1byte読み込む
 	// 失敗した場合-1を返す
-	virtual char read();
+	virtual unsigned char read();
 };
 
 #endif __SerialWrapper__
