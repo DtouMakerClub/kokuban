@@ -91,3 +91,13 @@ unsigned char SerialWrapper::read()
 		return buf[0];
 	}
 }
+
+void SerialWrapper::fflush()
+{
+	unsigned char buf[1]; // 受信データ格納用
+	DWORD numberOfRead; // 実際に受信したバイト数
+	
+	while(available()){
+		ReadFile(com_port, buf, 1, &numberOfRead, NULL);
+	}
+}
