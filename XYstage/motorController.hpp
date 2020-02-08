@@ -36,10 +36,17 @@ private:
     long targetYStep = 63140/2;
 
     //const long controllSycleTimeUS = 100000;//制御周期、設定値ではない便宜上の値。ほんとの値は知らない。制御の単位時間
-    long speedXHz = 15000;//パルスの周波数
-    long speedYHz = 15000;
-    long periodXUS = 1000000 / speedXHz;//単位時間/周波数　-> 周期 これをタイマの周期とする
-    long periodYUS = 1000000 / speedYHz;
+    const long SPEED_X_HZ_MAX = 5000;
+    const long SPEED_Y_HZ_MAX = 5000;
+    const long SPEED_X_HZ_MIN = 100;
+    const long SPEED_Y_HZ_MIN = 100;
+    long speedXHz = SPEED_X_HZ_MAX;//パルスの周波数
+    long speedYHz = SPEED_Y_HZ_MAX;//15000;
+
+    //long periodXUS = 1000000 / speedXHz;//単位時間/周波数　-> 周期 これをタイマの周期とする
+    //long periodYUS = 1000000 / speedYHz;
+
+    long convert2US(long Hz);
 
     //キャリブレーション用
     bool calibFinished = false;
@@ -58,6 +65,9 @@ private:
     bool isY1Limit();
     bool isLimit();
     
+    //速度調整
+    long getXStepDistance();
+    long getYStepDistance();
 
 
     //const unsigned long STEPPING_MOTOR_PERIOD_HALF_US = 300; //100;//周期はこれの２倍
@@ -72,6 +82,8 @@ public:
     long getYRange();
     long getPositionXStep();
     long getPositionYStep();
+    long calcSpeed();
+
     //目標地点追従用
     void setTargetPoint(long x, long y);
     void toggleXPulseAndUpdatePosition();

@@ -1,6 +1,14 @@
 #include "arduino.h"
 #include "motorController.hpp"
 
+long MotorController::convert2US(long Hz)
+{
+    if(Hz <= 1){//0割り防止
+        Hz = 1;
+    }
+    return 1000000 / Hz;
+}
+
 void MotorController::pinSetup()
 {
     pinMode(PIN_MOTOR_XY_ENABLE, OUTPUT);
@@ -222,17 +230,17 @@ int MotorController::setXSpeedToTarget()
             //Timer1.initialize(periodXUS);
         }
     }
-    return periodXUS;
+    return 0;//periodXUS;
 }
 
 long MotorController::getTimerPeriodForX()
 {
-    return periodXUS;
+    return convert2US(speedXHz);
 }
 
 long MotorController::getTimerPeriodForY()
 {
-    return periodYUS;
+    return convert2US(speedYHz);
 }
 
 long MotorController::getXRange()
@@ -253,6 +261,43 @@ long MotorController::getPositionXStep()
 long MotorController::getPositionYStep()
 {
     return positionYStep;
+}
+
+long MotorController::getXStepDistance()
+{
+    return positionXStep - targetXStep;
+}
+long MotorController::getYStepDistance()
+{
+    return positionYStep - targetYStep;
+}
+
+long MotorController::calcSpeed()
+{
+    const long SLOPE_COEF = 30;
+    // speedXHz = SPEED_X_HZ_MAX * abs(positionXStep - targetXStep) / rangeX;
+    // if(speedXHz >= SPEED_X_HZ_MAX){
+    //     speedXHz = SPEED_X_HZ_MAX;
+    // }
+
+    // speedYHz = SPEED_Y_HZ_MAX * abs(positionYStep - targetYStep) / rangeY;
+    // if(speedYHz >= SPEED_Y_HZ_MAX){
+    //     speedYHz = SPEED_Y_HZ_MAX;
+    // }
+
+    long distance = sqrt(pow(positionXStep - targetXStep,2)+pow(positionYStep - targetYStep,2));
+    speedXHz = speedYHz = SLOPE_COEF * SPEED_X_HZ_MAX / rangeX * distance;
+
+    if(speedXHz >= SPEED_X_HZ_MAX){
+        speedXHz = SPEED_X_HZ_MAX;
+    }else if(speedXHz < SPEED_X_HZ_MIN){
+        speedXHz = SPEED_X_HZ_MIN;
+    }
+    if(speedYHz >= SPEED_Y_HZ_MAX){
+        speedYHz = SPEED_Y_HZ_MAX;
+    }else if(speedYHz < SPEED_Y_HZ_MIN){
+        speedYHz = SPEED_Y_HZ_MIN;
+    }
 }
 
 void MotorController::setTargetPoint(long x, long y){

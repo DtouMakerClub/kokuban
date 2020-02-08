@@ -170,6 +170,13 @@ void loop() {
 
     if(state == MOVE){
       //
+      motorController.calcSpeed();
+      Timer1.setPeriod(motorController.getTimerPeriodForX());
+      #ifdef DEBUG
+      Serial.print("speed is  ");
+      Serial.print(motorController.getTimerPeriodForX(),DEC);
+      Serial.print('\n');
+      #endif //DEBUG
     }
     // motorController.setXSpeedToTarget();
 
