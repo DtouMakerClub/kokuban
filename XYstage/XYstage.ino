@@ -175,6 +175,10 @@ void loop() {
       #ifdef DEBUG
       Serial.print("speed is  ");
       Serial.print(motorController.getTimerPeriodForX(),DEC);
+      Serial.print("  x distance  ");
+      Serial.print(motorController.getXStepDistance(),DEC);
+      Serial.print("  y distance  ");
+      Serial.print(motorController.getYStepDistance(),DEC);
       Serial.print('\n');
       #endif //DEBUG
     }

@@ -65,9 +65,6 @@ private:
     bool isY1Limit();
     bool isLimit();
     
-    //速度調整
-    long getXStepDistance();
-    long getYStepDistance();
 
 
     //const unsigned long STEPPING_MOTOR_PERIOD_HALF_US = 300; //100;//周期はこれの２倍
@@ -88,6 +85,10 @@ public:
     void setTargetPoint(long x, long y);
     void toggleXPulseAndUpdatePosition();
     void toggleYPulseAndUpdatePosition();
+    
+    //速度調整
+    long getXStepDistance();
+    long getYStepDistance();
 };
 
 #endif
