@@ -48,6 +48,8 @@ cv::Point KokubanSerial::readMessage(cv::Point prev)
 		point.y = static_cast<int>(read());
 	}
 
+	fflush();
+
 	// ‚È‚º‚©³‚µ‚¢’l‚Æˆê‚É(0,0)‚ª‘—‚ç‚ê‚Ä‚­‚é‚Ì‚Å‘ÎÇ—Ã–@“I‚É‘Î‰
 	if (point == cv::Point(0, 0))
 	{
