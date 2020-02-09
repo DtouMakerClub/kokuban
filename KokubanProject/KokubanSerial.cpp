@@ -20,6 +20,11 @@ void KokubanSerial::start()
 
 void KokubanSerial::sendMessage(uchar x, uchar y)
 {
+	if (x < 0)		x = 0;
+	if (y < 0)		y = 0;
+	if (x > 255)	x = 255;
+	if (y > 255)	y = 255;
+
 	char message[4];
 	message[0] = 'M';
 	message[1] = x;
@@ -39,26 +44,29 @@ bool KokubanSerial::checkRead()
 	return false;
 }
 
+bool KokubanSerial::isReadableMessage()
+{
+	//受信データがない場合は読み込まない
+	if (available() < 1)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 cv::Point KokubanSerial::readMessage(cv::Point prev)
 {
 	cv::Point point;
 	if ( receive_message == read() ) 
 	{
-		point.x = static_cast<int>(read());
-		point.y = static_cast<int>(read());
+		point.x = read();
+		point.y = read();
 	}
 
 	fflush();
 
-	// なぜか正しい値と一緒に(0,0)が送られてくるので対症療法的に対応
-	if (point == cv::Point(0, 0))
-	{
-		return prev;
-	}
-	else
-	{
-		return point;
-	}
+	return point;
 }
 
 void KokubanSerial::stop()

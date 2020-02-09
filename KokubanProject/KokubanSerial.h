@@ -16,6 +16,7 @@ public:
 	void start();
 	void sendMessage(uchar x, uchar y);
 	bool checkRead();
+	bool isReadableMessage();
 	cv::Point readMessage(cv::Point prev);
 	void stop();
 
