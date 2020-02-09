@@ -24,7 +24,8 @@ namespace Eraser
 
 		void UpdateMove();
 		void DebugDraw(cv::Mat img);
-		void DebugSimulate();
+		void DebugSimulate(cv::Point target);
+		void DebugSend(cv::Point pos);
 
 		cv::Point2i const CAMERA_RESOLUTION = cv::Point2i(640, 480);
 		// 上の解像度だと100ピクセルぐらいがちょうどいいので0.1%	

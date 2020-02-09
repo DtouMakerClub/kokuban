@@ -29,7 +29,7 @@ namespace Eraser
 		UpdateState();
 
 		// 値の送信
-		//SendTargetPosition();
+		SendTargetPosition();
 
 		// デバッグ用環境
 		//DebugSimulate();
@@ -55,9 +55,12 @@ namespace Eraser
 			break;
 		}
 
-		cv::Point ratio = serialCommnad->readMessage(m_eraserPos);
-		m_eraserPos = RatioToPoint(ratio);
-		std::cout << m_eraserPos << std::endl;
+		if (serialCommnad->isReadableMessage())
+		{
+			cv::Point ratio = serialCommnad->readMessage(m_eraserPos);
+			m_eraserPos = RatioToPoint(ratio);
+			std::cout << m_eraserPos << std::endl;
+		}
 	}
 
 	inline void EraserManager::DebugDraw(cv::Mat img)
@@ -83,7 +86,7 @@ namespace Eraser
 
 		// 黒板消しの位置
 		//cv::rectangle(img, m_eraserPos, m_eraserPos + p1, cv::Scalar(0, 0, 0), 10, cv::LINE_4);
-		cv::circle(img, m_eraserPos, 10, cv::Scalar(0, 0, 255));
+		cv::circle(img, m_eraserPos, 10, cv::Scalar(0, 255, 255));
 
 		// 目的地
 		cv::rectangle(img, m_targetPoint, m_targetPoint + cv::Point(5, 5), cv::Scalar(255, 0, 255), 1, cv::LINE_4);
@@ -111,17 +114,35 @@ namespace Eraser
 		//std::cout << "target:" << m_targetIndex << std::endl;
 
 		cv::imshow("test", img);
-		cv::waitKey(1);
-	
+		int key = cv::waitKey(1);
+
+		//s
+		if (key == 115)
+		{
+			cv::Point mov = cv::Point(127, 127);
+			DebugSimulate(mov);
+			serialCommnad->sendMessage(mov.x, mov.y);
+		}
+
+		//t
+		if (key == 116)
+		{
+			m_state = EraserMoveState::POINT;
+		}
 	}
 
-	inline void EraserManager::DebugSimulate()
+	inline void EraserManager::DebugSimulate(cv::Point target)
 	{
 		m_nowAreaIndex = PointToArea(m_eraserPos);
-		cv::Point2i vec = m_targetPoint - m_eraserPos;
+		cv::Point2i vec = target - m_eraserPos;
 		vec /= cv::norm(vec);
 		m_prevPos = m_eraserPos;
 		m_eraserPos += vec * 2;
+	}
+
+	inline void EraserManager::DebugSend(cv::Point pos)
+	{
+		serialCommnad->sendMessage(pos.x, pos.y);
 	}
 
 	inline cv::Point2i EraserManager::FindNearest(int index)
@@ -135,12 +156,12 @@ namespace Eraser
 			int area = PointToArea(chalk);
 			/*if (area == m_nowAreaIndex)
 			{*/
-				dist = GetDistance(chalk, m_eraserPos);
-				if (minDist > dist)
-				{
-					target = chalk;
-					minDist = dist;
-				}
+			dist = GetDistance(chalk, m_eraserPos);
+			if (minDist > dist && dist > 100.0f)
+			{
+				target = chalk;
+				minDist = dist;
+			}
 			//}
 		}
 
@@ -178,13 +199,19 @@ namespace Eraser
 
 	inline void EraserManager::SendTargetPosition()
 	{
-		cv::Point2i sendPoint;
-		sendPoint = PointToRatio(m_targetPoint);
-		
-		// 送信するときに自分の位置に近すぎる座標は省く
+		if (m_state != EraserMoveState::READY)
+		{
+			cv::Point2i sendPoint;
+			sendPoint = PointToRatio(m_targetPoint);
 
-		serialCommnad->sendMessage(sendPoint.x, sendPoint.y);
+			// 送信するときに自分の位置に近すぎる座標は省く
+			float dist = GetDistance(m_eraserPos, sendPoint);
 
+			if (dist > 200.0f)
+			{
+				serialCommnad->sendMessage(sendPoint.x, sendPoint.y);
+			}
+		}
 	}
 
 	inline int EraserManager::TargetAreaCheck()
@@ -299,13 +326,13 @@ namespace Eraser
 	}
 	inline cv::Point2i EraserManager::PointToRatio(cv::Point2i pos)
 	{
-		cv::Point2i result;
+		cv::Point2f result;
 
 		// 送信用の仕様が0~255なのでそれに合わせている
-		result.x = (pos.x / CAMERA_RESOLUTION.x) * 255;
-		result.y = (pos.y / CAMERA_RESOLUTION.y) * 255;
+		result.x = static_cast<float>(pos.x) / static_cast<float>(CAMERA_RESOLUTION.x);
+		result.y = static_cast<float>(pos.y) / static_cast<float>(CAMERA_RESOLUTION.y);
 
-		return result;
+		return result * 255;
 	}
 
 	inline cv::Point2i EraserManager::RatioToPoint(cv::Point2i ratio)

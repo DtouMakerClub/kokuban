@@ -242,6 +242,8 @@ void Initialize()
 void Update()
 {
 	cv::Mat frame;
+	//cv::Mat dst;
+
 	while (true)
 	{
 		if (inputImage.empty() == true) 
@@ -254,8 +256,9 @@ void Update()
 		{
 			cap.read(inputImage);
 			frame = kokubanCV::clickPointPerspectiveTransformation(inputImage, src_pt);// color_to_binary(input_img, 128);
-			frame = kokubanCV::binary(frame);
-			eraserManager->chalkPoints = kokubanCV::pulledOutChalkOnKokuban(frame);;
+			frame = kokubanCV::binary(frame, 160);
+			//cv::flip(frame, dst, -1);
+			eraserManager->chalkPoints = kokubanCV::pulledOutChalkOnKokuban(frame);
 			//cv::imshow("binary", frame);//画像を表示
 			//inputImage = frame;
 			//cv::waitKey(1);

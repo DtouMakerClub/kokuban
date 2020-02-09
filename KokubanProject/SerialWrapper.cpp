@@ -70,26 +70,14 @@ int SerialWrapper::available()
 
 unsigned char SerialWrapper::read()
 {
-	//受信データがない場合は読み込まない
-	if (available() < 1)
-	{
-		return 0;
-	}
-
 	unsigned char buf[1]; // 受信データ格納用
 	DWORD numberOfRead; // 実際に受信したバイト数
 
 	//データ受信
 	bool result = ReadFile(com_port, buf, 1, &numberOfRead, NULL);
 
-	if (result == FALSE)
-	{
-		return 0;
-	}
-	else
-	{
-		return buf[0];
-	}
+	return buf[0];
+	
 }
 
 void SerialWrapper::fflush()
