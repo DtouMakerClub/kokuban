@@ -212,48 +212,59 @@ void  testMouse() {
 
 int main()
 {
-	test_Capture();
-	//Initialize();
+	//test_Capture();
+	Initialize();
 
-	//Update();
+	Update();
+
 	std::string x;
 	std::cin >> x;
-	//delete(eraserManager);
+	delete(eraserManager);
 	cv::destroyAllWindows();
 	return 0;
 }
 
 void Initialize()
 {
-	eraserManager = new Eraser::EraserManager();
-
 	// ここをwebカメラからの映像にする
-	inputImage = cv::imread("kokuban.jpg", cv::IMREAD_UNCHANGED);
+	cap.open(0);
+	if (!cap.isOpened()) {
+		std::cout << "Error : failed open camera" << std::endl;
+		//break;
+	}
+	cap.read(inputImage);
+
+	kokubanCV::returnClickPoints(inputImage, src_pt);
+	cv::waitKey(2000);
+	eraserManager = new Eraser::EraserManager();
 }
 
 void Update()
 {
-	cv::Point2f src_pt[4] = {};
-	kokubanCV::returnClickPoints(inputImage, src_pt);
-	cv::waitKey(2000);
+	cv::Mat frame;
+	//cv::Mat dst;
 
 	while (true)
 	{
-		if (inputImage.empty() == true) {
+		if (inputImage.empty() == true) 
+		{
 			// 画像データが読み込めなかったときは終了する
 			std::cout << "Error : failed read img" << std::endl;
 			break;
 		}
-		else {
-			cv::Mat frame = kokubanCV::clickPointPerspectiveTransformation(inputImage, src_pt);// color_to_binary(input_img, 128);
-			chalks = kokubanCV::pulledOutChalkOnKokuban(frame);
+		else 
+		{
+			cap.read(inputImage);
+			frame = kokubanCV::clickPointPerspectiveTransformation(inputImage, src_pt);// color_to_binary(input_img, 128);
+			frame = kokubanCV::maskOrange(frame);
+			frame = kokubanCV::binary(frame, 128);
+			eraserManager->chalkPoints = kokubanCV::pulledOutChalkOnKokuban(frame, 128);
 			//cv::imshow("binary", frame);//画像を表示
-			inputImage = frame;
+			//inputImage = frame;
 			//cv::waitKey(1);
 		}
-		eraserManager->chalkPoints = chalks;
 
 		eraserManager->Update();
-		eraserManager->DebugDraw(inputImage);
+		eraserManager->DebugDraw(frame);
 	}
 }

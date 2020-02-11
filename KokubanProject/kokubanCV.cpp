@@ -21,7 +21,7 @@ namespace kokubanCV {
 				}
 			}
 		}
-		std::cout << chalkPoints.size() <<   std::endl;
+		//std::cout << chalkPoints.size() <<   std::endl;
 
 		//’Šo‚µ‚½“_ŒQ‚ÌÀ•W‚ð•Ô‚·
 		return chalkPoints;
@@ -109,6 +109,8 @@ namespace kokubanCV {
 	}
 
 
+
+
 	void mouseCallback(int event, int x, int y, int flags, void* userdata)
 	{
 		mouseParam* ptr = static_cast<mouseParam*> (userdata);
@@ -117,6 +119,40 @@ namespace kokubanCV {
 		ptr->y = y;
 		ptr->event = event;
 		ptr->flags = flags;
+	}
+
+	cv::Mat maskOrange(cv::Mat input)
+	{
+		cv::Mat result;
+
+		const unsigned char h = 10;
+		const unsigned char s = 143;
+		const unsigned char v = 121;
+		auto low = cv::Scalar(0, s - 20, v - 20);
+		auto high = cv::Scalar(h/2 + 30, 255, 255);
+		
+		cv::Mat hsv_input;
+		cv::cvtColor(input, hsv_input, cv::COLOR_BGR2HSV);
+
+		cv::Mat mask;
+		cv::inRange(hsv_input, low, high, mask);
+		cv::imshow("mask", mask);
+
+		cv::Mat dilateElement(5, 5, CV_8U, cv::Scalar(1));
+		cv::dilate(mask, mask, dilateElement);
+		cv::dilate(mask, mask, dilateElement);
+		cv::dilate(mask, mask, dilateElement);
+		cv::dilate(mask, mask, dilateElement);
+		cv::dilate(mask, mask, dilateElement);
+		cv::dilate(mask, mask, dilateElement);
+
+		cv::bitwise_not(mask, mask);
+		cv::bitwise_and(input, input, result, mask);
+		cv::imshow("result", result);
+
+		cv::waitKey(1);
+
+		return result;
 	}
 
 

@@ -49,6 +49,7 @@ namespace kokubanCV {
 	void returnClickPoints(cv::Mat input_image, cv::Point2f point[4]);
 
 	void mouseCallback(int event, int x, int y, int flags, void* userdata);
+	cv::Mat maskOrange(cv::Mat input);
 
 	cv::VideoCapture openVideoFile(std::string video_name);
 	template <class Fn> void funcVideo(std::string video_name, std::string save_file_name, Fn fn);

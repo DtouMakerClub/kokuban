@@ -20,6 +20,11 @@ void KokubanSerial::start()
 
 void KokubanSerial::sendMessage(uchar x, uchar y)
 {
+	if (x < 0)		x = 0;
+	if (y < 0)		y = 0;
+	if (x > 255)	x = 255;
+	if (y > 255)	y = 255;
+
 	char message[4];
 	message[0] = 'M';
 	message[1] = x;
@@ -29,13 +34,38 @@ void KokubanSerial::sendMessage(uchar x, uchar y)
 	write(message, 4);
 }
 
-cv::Point KokubanSerial::readMessage()
+bool KokubanSerial::checkRead()
+{
+	char head = read();
+	if (head == receive_message)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool KokubanSerial::isReadableMessage()
+{
+	//受信データがない場合は読み込まない
+	if (available() < 1)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+cv::Point KokubanSerial::readMessage(cv::Point prev)
 {
 	cv::Point point;
-	if ( move_message == read()) {
+	if ( receive_message == read() ) 
+	{
 		point.x = read();
 		point.y = read();
 	}
+
+	fflush();
+
 	return point;
 }
 
