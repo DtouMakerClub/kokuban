@@ -157,7 +157,7 @@ namespace Eraser
 			/*if (area == m_nowAreaIndex)
 			{*/
 			dist = GetDistance(chalk, m_eraserPos);
-			if (minDist > dist && dist > 100.0f)
+			if (minDist > dist)
 			{
 				target = chalk;
 				minDist = dist;
@@ -181,12 +181,11 @@ namespace Eraser
 			// 現エリアの重みが小さくなったら
 			//if (m_areaWeight[m_nowAreaIndex] < ((CAMERA_RESOLUTION.x * CAMERA_RESOLUTION.y) / 9) * MOVE_RATE)
 			// ある一定の近さにチョークがなかったら
-			if (GetDistance(m_targetPoint, m_eraserPos) > 200.0f)
+			if (GetDistance(m_targetPoint, m_eraserPos) > 600.0f)
 			{
 				m_state = EraserMoveState::AREA;
 				//CulcurateArea();
 			}
-
 			// エリアの移動が完了したら
 			else if (m_nowAreaIndex == m_targetIndex)
 			{
@@ -207,7 +206,7 @@ namespace Eraser
 			// 送信するときに自分の位置に近すぎる座標は省く
 			float dist = GetDistance(m_eraserPos, sendPoint);
 
-			if (dist > 200.0f)
+			if (dist > 50.0f)
 			{
 				serialCommnad->sendMessage(sendPoint.x, sendPoint.y);
 			}
