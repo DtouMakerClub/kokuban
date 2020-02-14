@@ -37,7 +37,7 @@ namespace Eraser
 		KokubanSerial* serialCommnad = nullptr;
 
 		cv::Point2i GetEraserPos() { return m_eraserPos; }
-		int GetAreaIndex() { return m_nowAreaIndex; }
+		int GetAreaIndex() { return m_eraserAreaIndex; }
 		std::vector<cv::Point2i> GetChalk() { return chalkPoints; }
 
 		std::vector<cv::Point2i> chalkPoints;			// 検出したチョークのピクセル
@@ -46,7 +46,7 @@ namespace Eraser
 		// 移動するエリアの決定
 		int TargetAreaCheck();
 		// 自身の位置に最近傍の点を取得する
-		cv::Point2i FindNearest(int index);
+		cv::Point2i FindNearest();
 		void UpdateState();
 		// 目標位置の送信
 		void SendTargetPosition();
@@ -64,11 +64,12 @@ namespace Eraser
 		float GetDistance(cv::Point p1, cv::Point p2);
 
 		int m_areaWeight[9];				// 各エリアの重み
-		int m_nowAreaIndex;					// 自分の位置エリア
+		int m_eraserAreaIndex;					// 自分の位置エリア
 		cv::Point2i m_eraserPos;				// 自分の位置座標
 		cv::Point2i m_prevPos;				// 自分の位置座標
 		int m_targetIndex;					// 目標位置のエリア
 		cv::Point2i m_targetPoint;			// 目標位置の座標
+		cv::TickMeter m_timer;
 
 		// 現在いるエリアの重み
 		int m_nowAreaWeight;

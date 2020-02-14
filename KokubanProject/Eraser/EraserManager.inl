@@ -10,6 +10,8 @@ namespace Eraser
 		m_prevPos = m_eraserPos;
 		serialCommnad = new KokubanSerial(4);
 
+		cv::waitKey(2000);
+
 		// XYステージのキャリブレーション命令
 		serialCommnad->start();
 	}
@@ -32,7 +34,7 @@ namespace Eraser
 		SendTargetPosition();
 
 		// デバッグ用環境
-		//DebugSimulate();
+		//DebugSimulate(m_targetPoint);
 
 	}
 
@@ -46,10 +48,11 @@ namespace Eraser
 		case EraserMoveState::AREA:
 			// 移動するためのエリアを選出
 			m_targetPoint = AreaToPoint(m_targetIndex);
+			m_eraserAreaIndex = PointToArea(m_eraserPos);
 			break;
 		case EraserMoveState::POINT:
 			// 自身から最も近い点を取得する
-			m_targetPoint = FindNearest(m_nowAreaIndex);
+			m_targetPoint = FindNearest();
 			break;
 		default:
 			break;
@@ -133,7 +136,7 @@ namespace Eraser
 
 	inline void EraserManager::DebugSimulate(cv::Point target)
 	{
-		m_nowAreaIndex = PointToArea(m_eraserPos);
+		m_eraserAreaIndex = PointToArea(m_eraserPos);
 		cv::Point2i vec = target - m_eraserPos;
 		vec /= cv::norm(vec);
 		m_prevPos = m_eraserPos;
@@ -145,7 +148,7 @@ namespace Eraser
 		serialCommnad->sendMessage(pos.x, pos.y);
 	}
 
-	inline cv::Point2i EraserManager::FindNearest(int index)
+	inline cv::Point2i EraserManager::FindNearest()
 	{
 		cv::Point2i target;
 		float minDist = 100000.0f;
@@ -169,30 +172,33 @@ namespace Eraser
 	}
 	inline void EraserManager::UpdateState()
 	{
-		if (m_state == EraserMoveState::READY)
+		switch (m_state)
 		{
+		case Eraser::EraserManager::EraserMoveState::READY:
+			// arduinoからなにか送られてきたら開始する
 			if (serialCommnad->checkRead())
 			{
 				m_state = EraserMoveState::POINT;
+				m_timer.start();
 			}
-		}
-		else
-		{
-			// 現エリアの重みが小さくなったら
-			//if (m_areaWeight[m_nowAreaIndex] < ((CAMERA_RESOLUTION.x * CAMERA_RESOLUTION.y) / 9) * MOVE_RATE)
-			// ある一定の近さにチョークがなかったら
-			if (GetDistance(m_targetPoint, m_eraserPos) > 600.0f)
-			{
-				m_state = EraserMoveState::AREA;
-				//CulcurateArea();
-			}
-			// エリアの移動が完了したら
-			else if (m_nowAreaIndex == m_targetIndex)
+			break;
+		case Eraser::EraserManager::EraserMoveState::AREA:
+			if (GetDistance(m_targetPoint, m_eraserPos) < 300.0f)
 			{
 				m_state = EraserMoveState::POINT;
-				//CulcurateArea();
-				m_targetIndex = std::rand() % 9;//TargetAreaCheck();
 			}
+			break;
+		case Eraser::EraserManager::EraserMoveState::POINT:
+			if (GetDistance(m_targetPoint, m_eraserPos) > 300.0f
+					|| m_timer.getTimeSec() > 5)
+			{
+				m_state = EraserMoveState::AREA;
+				m_targetIndex = std::rand() % 9;//TargetAreaCheck();
+				m_timer.reset();
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -206,7 +212,8 @@ namespace Eraser
 			// 送信するときに自分の位置に近すぎる座標は省く
 			float dist = GetDistance(m_eraserPos, sendPoint);
 
-			if (dist > 50.0f)
+			// 近すぎるのは省いている(なぜ？)
+			if (dist > 30.0f)
 			{
 				serialCommnad->sendMessage(sendPoint.x, sendPoint.y);
 			}
@@ -235,7 +242,7 @@ namespace Eraser
 
 		if (index < 3)
 		{
-			result.x = CAMERA_RESOLUTION.x / 6;
+			result.x = CAMERA_RESOLUTION.x / 12;
 		}
 		else if (index < 6)
 		{
@@ -243,12 +250,12 @@ namespace Eraser
 		}
 		else if (index < 9)
 		{
-			result.x = (CAMERA_RESOLUTION.x / 6) * 5;
+			result.x = (CAMERA_RESOLUTION.x / 12) * 11;
 		}
 
 		if (index % 3 == 0)
 		{
-			result.y = CAMERA_RESOLUTION.y / 6;
+			result.y = CAMERA_RESOLUTION.y / 12;
 		}
 		else if (index % 3 == 1)
 		{
@@ -256,7 +263,7 @@ namespace Eraser
 		}
 		else if (index % 3 == 2)
 		{
-			result.y = (CAMERA_RESOLUTION.y / 6) * 5;
+			result.y = (CAMERA_RESOLUTION.y / 12) * 11;
 		}
 
 		return result;

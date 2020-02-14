@@ -136,7 +136,6 @@ namespace kokubanCV {
 
 		cv::Mat mask;
 		cv::inRange(hsv_input, low, high, mask);
-		cv::imshow("mask", mask);
 
 		cv::Mat dilateElement(5, 5, CV_8U, cv::Scalar(1));
 		cv::dilate(mask, mask, dilateElement);
@@ -148,7 +147,7 @@ namespace kokubanCV {
 
 		cv::bitwise_not(mask, mask);
 		cv::bitwise_and(input, input, result, mask);
-		cv::imshow("result", result);
+		cv::imshow("mask", mask);
 
 		cv::waitKey(1);
 
