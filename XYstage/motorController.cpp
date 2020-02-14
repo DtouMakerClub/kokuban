@@ -282,7 +282,7 @@ long MotorController::getYStepDistance()
 
 long MotorController::calcSpeed()
 {
-    const long SLOPE_COEF = 30;
+    const long SLOPE_COEF = 50;
 
     long distance = sqrt(pow(positionXStep - targetXStep,2)+pow(positionYStep - targetYStep,2));
     speedXHz = speedYHz = ((SLOPE_COEF * SPEED_X_HZ_MAX) / rangeX) * distance; //計算順序はオーバーフローせずに有効桁数を残すため
