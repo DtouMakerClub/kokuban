@@ -257,11 +257,11 @@ void Update()
 			cap.read(inputImage);
 			frame = kokubanCV::clickPointPerspectiveTransformation(inputImage, src_pt);// color_to_binary(input_img, 128);
 			frame = kokubanCV::maskOrange(frame);
-			frame = kokubanCV::binary(frame, 128);
-			eraserManager->chalkPoints = kokubanCV::pulledOutChalkOnKokuban(frame, 128);
-			//cv::imshow("binary", frame);//画像を表示
+			frame = kokubanCV::binary(frame, 140);
+			eraserManager->chalkPoints = kokubanCV::pulledOutChalkOnKokuban(frame, 140);
+			cv::imshow("camera", inputImage);//画像を表示
 			//inputImage = frame;
-			//cv::waitKey(1);
+			cv::waitKey(1);
 		}
 
 		eraserManager->Update();
