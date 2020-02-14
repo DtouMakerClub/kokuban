@@ -73,6 +73,8 @@ public:
     void calibration();
     bool hasCalibFinished();
     int setXSpeedToTarget();
+    long getTargetXStep();
+    long getTargetYStep();
     long getTimerPeriodForX();
     long getTimerPeriodForY();
     long getXRange();
@@ -85,7 +87,7 @@ public:
     void setTargetPoint(long x, long y);
     void toggleXPulseAndUpdatePosition();
     void toggleYPulseAndUpdatePosition();
-    
+
     //速度調整
     long getXStepDistance();
     long getYStepDistance();

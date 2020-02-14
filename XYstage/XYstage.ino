@@ -1,4 +1,5 @@
 #include "motorController.hpp"
+#include "RCFilter.hpp"
 #include <TimerOne.h>
 #include "ellipsetable.hpp"
 
@@ -62,6 +63,9 @@ const unsigned long STEPPING_MOTOR_PERIOD_HALF_US = 300;//100;//周期はこれ�
 
 MotorController motorController = MotorController();
 
+RCFilter xFilter(0.99);
+RCFilter yFilter(0.99);
+
 void setup() {
   Serial.begin(9600);
   #ifdef DEBUG
@@ -71,6 +75,9 @@ void setup() {
   motorController.pinSetup();
   pinMode(LED_BUILTIN,OUTPUT);
   digitalWrite(LED_BUILTIN,LOW);
+
+  xFilter.init(motorController.getTargetXStep());
+  yFilter.init(motorController.getTargetYStep());
 
   //パルス出力用のtimer
   Timer1.initialize(motorController.getTimerPeriodForX());
@@ -148,10 +155,15 @@ void loop() {
         //受信値をモータ―のレンジに変換(OK)
         //それを平滑化(まだ)
         //目標値更新(OK)
-        motorController.setTargetPoint(
-          convertToMotorStepRange(receiveData.getX(),motorController.getXRange()),
-          convertToMotorStepRange(receiveData.getY(),motorController.getYRange())
-        );
+        // motorController.setTargetPoint(
+        //   convertToMotorStepRange(receiveData.getX(),motorController.getXRange()),
+        //   convertToMotorStepRange(receiveData.getY(),motorController.getYRange())
+        // );
+
+        //受信値をモータ―のレンジに変換(OK)
+        //それを平滑化フィルタに渡す(OK)
+        xFilter.input(convertToMotorStepRange(receiveData.getX(),motorController.getXRange()));
+        yFilter.input(convertToMotorStepRange(receiveData.getY(),motorController.getYRange()));
         // Serial.print(convertToMotorStepRange(receiveData.getX(),motorController.getXRange()), DEC);
         // Serial.print('\n');
         // Serial.print(convertToMotorStepRange(receiveData.getY(),motorController.getYRange()), DEC);
@@ -164,6 +176,18 @@ void loop() {
     
     commandReceived = false;
   }
+
+  xFilter.update();
+  yFilter.update();
+  motorController.setTargetPoint(xFilter.output(),yFilter.output());
+
+  #ifdef DEBUG
+  Serial.print(xFilter.output(),DEC);
+  Serial.print("   ");
+  Serial.print(yFilter.output(),DEC);
+  Serial.print('\n');
+  #endif //DEBUG
+
 
   //指令位置へ動作するための速度計算等（の予定）
   if(motorController.hasCalibFinished()){
