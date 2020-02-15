@@ -8,7 +8,7 @@ namespace Eraser
 		
 		m_eraserPos = cv::Point2i(CAMERA_RESOLUTION.x / 2, CAMERA_RESOLUTION.y / 2);
 		m_prevPos = m_eraserPos;
-		serialCommnad = new KokubanSerial(4);
+		serialCommnad = new KokubanSerial(3);
 
 		cv::waitKey(2000);
 

@@ -141,9 +141,10 @@ namespace kokubanCV {
 		cv::dilate(mask, mask, dilateElement);
 		cv::dilate(mask, mask, dilateElement);
 		cv::dilate(mask, mask, dilateElement);
-		cv::dilate(mask, mask, dilateElement);
-		cv::dilate(mask, mask, dilateElement);
-		cv::dilate(mask, mask, dilateElement);
+		
+		//cv::dilate(mask, mask, dilateElement);
+		//cv::dilate(mask, mask, dilateElement);
+		//cv::dilate(mask, mask, dilateElement);
 
 		cv::bitwise_not(mask, mask);
 		cv::bitwise_and(input, input, result, mask);
