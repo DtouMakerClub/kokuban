@@ -2,13 +2,15 @@
 
 namespace kokubanCV {
 
-	std::vector<cv::Point>  pulledOutChalkOnKokuban(cv::Mat image, int threshold)
+	std::vector<cv::Point>  pulledOutChalkOnKokuban(cv::Mat image, int threshold, int ksize)
 	{
 		int width = image.cols;
 		int height = image.rows;
 		std::vector<cv::Point> chalkPoints;
 		cv::Vec3b zero = (0, 0, 0);
 		cv::Mat_<cv::Vec3b> img(image);
+	    assert(ksize % 2 == 1);
+		cv::medianBlur(image, img, ksize);
 
 		for (int y = 0; y <height; ++y) {
 			//yŽ²‚ð‘–¸
@@ -28,11 +30,13 @@ namespace kokubanCV {
 	}
 
 
-	cv::Mat binary(cv::Mat img, int threshold)
+	cv::Mat binary(cv::Mat img, int threshold, int ksize)
 	{
 		int width = img.cols;
 		int height = img.rows;
 		cv::Mat binary_img = img;
+		assert(ksize % 2 == 1);
+		cv::medianBlur(img, binary_img,  ksize);
 
 		for (int y = 0; y < height -10; ++y) {
 			//yŽ²‚ð‘–¸
