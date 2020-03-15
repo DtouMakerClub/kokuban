@@ -54,4 +54,28 @@ namespace kokubanCV {
 	cv::VideoCapture openVideoFile(std::string video_name);
 	template <class Fn> void funcVideo(std::string video_name, std::string save_file_name, Fn fn);
 
+	/// <summary>
+/// 矩形を検出する
+/// 検出した矩形に線を描いた画像を返す
+/// </summary>
+/// <param name="threshold_image">画像</param>
+/// <returns>黒板の領域を検出した座標</returns>
+	std::vector<std::vector<cv::Point>> conto(cv::Mat img);
+
+/// /// <summary>
+/// 画像を2値化する（仮）
+/// </summary>
+/// <param name="frame">処理対象のカラー画像</param>
+/// <param name="threshold">2値化の閾値</param>
+/// <param name="is_bright">画像が明るいときはtrueにすると良いかも</param>
+/// <returns>2値化した画像</returns>
+	cv::Mat color_to_binary(cv::Mat frame, int threshold = 128, bool is_bright = false);
+
+///<summary>
+///<para>カメラと接続してフレームごとに処理をする</para>
+/// <para>camera open and some process every frame</para>
+///</summary>
+///<param name="device_nan">開くデバイスの選択</param>
+/// <param name="fn">取得したフレームを引数に取り処理をする関数</param>
+	template<class Fn> void run_capture_and_process(int device_nan, Fn fn);
 }
