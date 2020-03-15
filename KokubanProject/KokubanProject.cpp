@@ -99,8 +99,8 @@ void testChalk() {
 }
 
 
-void  testMouse() {
-	std::string image_name = "kokuuchi350";
+void  test_Mouse() {
+	std::string image_name = "kokuban";
 	cv::Mat input_img = cv::imread(image_name + ".jpg", cv::IMREAD_UNCHANGED);
 	if (input_img.empty() == true) {
 		// 画像データが読み込めなかったときは終了する
@@ -109,14 +109,16 @@ void  testMouse() {
 	else {
 		//cv::Mat frame = kokubanCV::clickPointPerspectiveTransformation(input_img);
 		//a = kokubanCV::pulledOutChalkOnKokuban(frame);
-		//cv::imshow("binary", kokubanCV::binary(frame, 160));//画像を表示
+		cv::Mat binary = kokubanCV::binary(input_img, 160);
+		cv::imshow("binary", binary);//画像を表示
+		//cv::imwrite("Median.jpg", binary);
 		cv::waitKey(1);
 	}
 }
 
 int main()
 {
-	//test_Capture();
+	//test_Mouse();
 	Initialize();
 
 	Update();

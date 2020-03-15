@@ -18,19 +18,21 @@ namespace kokubanCV {
 	/// </summary>
 	/// <param name="binary_img">カラー画像</param>
 	/// <param name=" threshold">2値化時の閾値</param>
+	/// <param name="ksize">フィルタ処理時の処理単位の行列の大きさ 1以上の奇数を設定する</param>
 	/// <returns>白い部分の座標point(x,y)が入ったvector</returns>
-	std::vector<cv::Point>  pulledOutChalkOnKokuban(cv::Mat image, int threshold = 128);
+	std::vector<cv::Point>  pulledOutChalkOnKokuban(cv::Mat image, int threshold = 128, int ksize = 7);
 
-/// <summary>
-/// 自作2値か関数
-/// 入力画像がjpgならまともに動く
-/// mp4もいけた
-/// pngは変になる（たぶん配列に入っている順番とか要素が違う）
-/// </summary>
-/// <param name="img">カラー画像</param>
-/// <param name=" threshold">2値化時の閾値</param>
-/// <returns>2値化した画像</returns>
-	cv::Mat binary(cv::Mat img, int threshold = 128);
+	/// <summary>
+	/// 自作2値か関数
+	/// 入力画像がjpgならまともに動く
+	/// mp4もいけた
+	/// pngは変になる（たぶん配列に入っている順番とか要素が違う）
+	/// </summary>
+	/// <param name="img">カラー画像</param>
+	/// <param name=" threshold">2値化時の閾値</param>
+	/// <param name="ksize">フィルタ処理時の処理単位の行列の大きさ 1以上の奇数を設定する</param>
+	/// <returns>2値化した画像</returns>
+	cv::Mat binary(cv::Mat img, int threshold = 128, int ksize = 7);
 	
 	/// <summary>
 	/// 指定された4点で透視変換を行う
@@ -55,27 +57,28 @@ namespace kokubanCV {
 	template <class Fn> void funcVideo(std::string video_name, std::string save_file_name, Fn fn);
 
 	/// <summary>
-/// 矩形を検出する
-/// 検出した矩形に線を描いた画像を返す
-/// </summary>
-/// <param name="threshold_image">画像</param>
-/// <returns>黒板の領域を検出した座標</returns>
+	/// 矩形を検出する
+	/// 検出した矩形に線を描いた画像を返す
+	/// </summary>
+	/// <param name="threshold_image">画像</param>
+	/// <returns>黒板の領域を検出した座標</returns>
 	std::vector<std::vector<cv::Point>> conto(cv::Mat img);
 
-/// /// <summary>
-/// 画像を2値化する（仮）
-/// </summary>
-/// <param name="frame">処理対象のカラー画像</param>
-/// <param name="threshold">2値化の閾値</param>
-/// <param name="is_bright">画像が明るいときはtrueにすると良いかも</param>
-/// <returns>2値化した画像</returns>
+	/// <summary>
+	/// 画像を2値化する
+	/// opencvのやつ
+	/// </summary>
+	/// <param name="frame">処理対象のカラー画像</param>
+	/// <param name="threshold">2値化の閾値</param>
+	/// <param name="is_bright">画像が明るいときはtrueにすると良いかも</param>
+	/// <returns>2値化した画像</returns>
 	cv::Mat color_to_binary(cv::Mat frame, int threshold = 128, bool is_bright = false);
 
-///<summary>
-///<para>カメラと接続してフレームごとに処理をする</para>
-/// <para>camera open and some process every frame</para>
-///</summary>
-///<param name="device_nan">開くデバイスの選択</param>
-/// <param name="fn">取得したフレームを引数に取り処理をする関数</param>
+	///<summary>
+	///<para>カメラと接続してフレームごとに処理をする</para>
+	/// <para>camera open and some process every frame</para>
+	///</summary>
+	///<param name="device_nan">開くデバイスの選択</param>
+	/// <param name="fn">取得したフレームを引数に取り処理をする関数</param>
 	template<class Fn> void run_capture_and_process(int device_nan, Fn fn);
 }
