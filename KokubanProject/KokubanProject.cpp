@@ -111,17 +111,17 @@ void  test_Mouse() {
 		//a = kokubanCV::pulledOutChalkOnKokuban(frame);
 		cv::Mat binary = kokubanCV::binary(input_img, 160);
 		cv::imshow("binary", binary);//画像を表示
-		cv::imwrite("Median.jpg", binary);
+		//cv::imwrite("Median.jpg", binary);
 		cv::waitKey(1);
 	}
 }
 
 int main()
 {
-	test_Mouse();
-	//Initialize();
+	//test_Mouse();
+	Initialize();
 
-	//Update();
+	Update();
 
 	std::string x;
 	std::cin >> x;
