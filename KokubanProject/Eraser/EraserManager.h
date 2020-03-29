@@ -15,12 +15,14 @@ namespace Eraser
 			READY,
 			AREA,
 			POINT,
+			PAUSE,
 		};
 
 		EraserManager();
 		~EraserManager();
 
 		void Update();
+		void InputKey();
 
 		void UpdateMove();
 		void DebugDraw(cv::Mat img);
@@ -42,7 +44,6 @@ namespace Eraser
 
 		std::vector<cv::Point2i> chalkPoints;			// 検出したチョークのピクセル
 	private:
-
 		// 移動するエリアの決定
 		int TargetAreaCheck();
 		// 自身の位置に最近傍の点を取得する

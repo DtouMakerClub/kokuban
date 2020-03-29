@@ -36,6 +36,9 @@ namespace Eraser
 		// デバッグ用環境
 		//DebugSimulate(m_targetPoint);
 
+		// キー入力
+		InputKey();
+
 	}
 
 	void EraserManager::UpdateMove()
@@ -53,6 +56,9 @@ namespace Eraser
 		case EraserMoveState::POINT:
 			// 自身から最も近い点を取得する
 			m_targetPoint = FindNearest();
+			break;
+		case EraserMoveState::PAUSE:
+			m_targetPoint = m_eraserPos;
 			break;
 		default:
 			break;
@@ -118,20 +124,6 @@ namespace Eraser
 
 		cv::imshow("test", img);
 		int key = cv::waitKey(1);
-
-		//s
-		if (key == 115)
-		{
-			cv::Point mov = cv::Point(127, 127);
-			DebugSimulate(mov);
-			serialCommnad->sendMessage(mov.x, mov.y);
-		}
-
-		//t
-		if (key == 116)
-		{
-			m_state = EraserMoveState::POINT;
-		}
 	}
 
 	inline void EraserManager::DebugSimulate(cv::Point target)
@@ -174,7 +166,7 @@ namespace Eraser
 	{
 		switch (m_state)
 		{
-		case Eraser::EraserManager::EraserMoveState::READY:
+		case EraserMoveState::READY:
 			// arduinoからなにか送られてきたら開始する
 			if (serialCommnad->checkRead())
 			{
@@ -182,13 +174,13 @@ namespace Eraser
 				m_timer.start();
 			}
 			break;
-		case Eraser::EraserManager::EraserMoveState::AREA:
+		case EraserMoveState::AREA:
 			if (GetDistance(m_targetPoint, m_eraserPos) < 300.0f)
 			{
 				m_state = EraserMoveState::POINT;
 			}
 			break;
-		case Eraser::EraserManager::EraserMoveState::POINT:
+		case EraserMoveState::POINT:
 			if (GetDistance(m_targetPoint, m_eraserPos) > 300.0f
 					|| m_timer.getTimeSec() > 5)
 			{
@@ -197,6 +189,8 @@ namespace Eraser
 				m_timer.reset();
 			}
 			break;
+		case EraserMoveState::PAUSE:
+			
 		default:
 			break;
 		}
@@ -216,6 +210,41 @@ namespace Eraser
 			if (dist > 30.0f)
 			{
 				serialCommnad->sendMessage(sendPoint.x, sendPoint.y);
+			}
+		}
+	}
+
+	inline void EraserManager::InputKey()
+	{
+		int key = cv::waitKey(1);
+
+		// S key
+		if (key == 115)
+		{
+			// 真ん中に移動する
+			cv::Point mov = cv::Point(127, 127);
+			DebugSimulate(mov);
+			serialCommnad->sendMessage(mov.x, mov.y);
+		}
+
+		// T key
+		if (key == 116)
+		{
+			// 近傍探索モードになる
+			m_state = EraserMoveState::POINT;
+		}
+
+		if (key == 112)
+		{
+			if (m_state == EraserMoveState::PAUSE)
+			{
+				// 再開モード
+				m_state = EraserMoveState::POINT;
+			}
+			else
+			{
+				// 一時停止モード
+				m_state = EraserMoveState::PAUSE;
 			}
 		}
 	}

@@ -167,10 +167,17 @@ void Update()
 			eraserManager->chalkPoints = kokubanCV::pulledOutChalkOnKokuban(frame, 180);
 			cv::imshow("camera", inputImage);//画像を表示
 			//inputImage = frame;
-			cv::waitKey(1);
+			int key = cv::waitKey(1);
+			
+			// Q key 「終了処理」
+			if (key == 113)
+			{
+				break;
+			}
 		}
 
 		eraserManager->Update();
+		eraserManager->InputKey();
 		eraserManager->DebugDraw(frame);
 	}
 }
