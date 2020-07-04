@@ -175,17 +175,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ayataka\RectangleDetection.inl" />
-    <None Include="Eraser\AreaMoveState.inl" />
     <None Include="Eraser\EraserManager.inl" />
-    <None Include="Eraser\EraserStateBase.inl" />
-    <None Include="Eraser\PointMoveState.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ayataka\RectangleDetection.h" />
-    <ClInclude Include="Eraser\AreaMoveState.h" />
     <ClInclude Include="Eraser\EraserManager.h" />
-    <ClInclude Include="Eraser\EraserStateBase.h" />
-    <ClInclude Include="Eraser\PointMoveState.h" />
     <ClInclude Include="kokubanCV.h" />
     <ClInclude Include="KokubanProject.h" />
     <ClInclude Include="KokubanSerial.h" />

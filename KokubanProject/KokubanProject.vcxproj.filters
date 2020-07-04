@@ -12,16 +12,7 @@
     <ClInclude Include="kokubanCV.h" />
     <ClInclude Include="SerialWrapper.h" />
     <ClInclude Include="KokubanSerial.h" />
-    <ClInclude Include="Eraser\AreaMoveState.h">
-      <Filter>Eraser</Filter>
-    </ClInclude>
     <ClInclude Include="Eraser\EraserManager.h">
-      <Filter>Eraser</Filter>
-    </ClInclude>
-    <ClInclude Include="Eraser\EraserStateBase.h">
-      <Filter>Eraser</Filter>
-    </ClInclude>
-    <ClInclude Include="Eraser\PointMoveState.h">
       <Filter>Eraser</Filter>
     </ClInclude>
     <ClInclude Include="test_ayataka.h" />
@@ -32,16 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ayataka\RectangleDetection.inl" />
-    <None Include="Eraser\AreaMoveState.inl">
-      <Filter>Eraser</Filter>
-    </None>
     <None Include="Eraser\EraserManager.inl">
-      <Filter>Eraser</Filter>
-    </None>
-    <None Include="Eraser\EraserStateBase.inl">
-      <Filter>Eraser</Filter>
-    </None>
-    <None Include="Eraser\PointMoveState.inl">
       <Filter>Eraser</Filter>
     </None>
   </ItemGroup>
