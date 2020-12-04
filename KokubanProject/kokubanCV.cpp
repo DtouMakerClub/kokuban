@@ -126,7 +126,7 @@ namespace kokubanCV {
 		cv::Mat result;
 
 		const unsigned char h = 10;
-		const unsigned char s = 143;
+		const unsigned char s = 100;//143;
 		const unsigned char v = 121;
 		auto low = cv::Scalar(0, s - 20, v - 20);
 		auto high = cv::Scalar(h/2 + 30, 255, 255);
@@ -142,9 +142,9 @@ namespace kokubanCV {
 		cv::dilate(mask, mask, dilateElement);
 		cv::dilate(mask, mask, dilateElement);
 		
-		//cv::dilate(mask, mask, dilateElement);
-		//cv::dilate(mask, mask, dilateElement);
-		//cv::dilate(mask, mask, dilateElement);
+		cv::dilate(mask, mask, dilateElement);
+		cv::dilate(mask, mask, dilateElement);
+		cv::dilate(mask, mask, dilateElement);
 
 		cv::bitwise_not(mask, mask);
 		cv::bitwise_and(input, input, result, mask);
